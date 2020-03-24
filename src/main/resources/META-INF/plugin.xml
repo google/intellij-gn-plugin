@@ -1,0 +1,53 @@
+<!--  Copyright (c) 2020 Google LLC All rights reserved. -->
+<!--  Use of this source code is governed by a BSD-style -->
+<!--  license that can be found in the LICENSE file. -->
+
+<idea-plugin>
+  <id>fuchsia.developer.plugin.gn</id>
+  <name>GN</name>
+  <vendor
+      url="https://fuchsia.googlesource.com/intellij-language-gn/">The Fuchsia Authors
+  </vendor>
+  <category>Languages</category>
+
+  <description><![CDATA[
+        <a href="https://gn.googlesource.com/gn">GN</a> Plugin for IntelliJ.<br>
+    <h2> Features </h2>
+    <ul>
+    <li> Syntax and Semantic Highlighting </li>
+    <li> Error highlighting </li>
+    </ul>
+    ]]></description>
+
+  <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
+       on how to target different products -->
+  <depends>com.intellij.modules.lang</depends>
+
+
+  <extensions defaultExtensionNs="com.intellij">
+    <fileType name="GN" implementationClass="com.google.idea.gn.GnFileType" language="gn"
+        extensions="gn;gni" fieldName="INSTANCE"/>
+    <lang.parserDefinition language="gn"
+        implementationClass="com.google.idea.gn.GnParserDefinition"/>
+    <lang.syntaxHighlighterFactory language="gn"
+        implementationClass="com.google.idea.gn.GnSyntaxHighlighterFactory"/>
+
+    <completion.contributor language="gn"
+        implementationClass="com.google.idea.gn.GnCompletionContributor"/>
+
+    <annotator language="gn" implementationClass="com.google.idea.gn.GnAnnotator"/>
+    <lang.quoteHandler language="gn"
+        implementationClass="com.google.idea.gn.GnQuoteHandler"/>
+    <typedHandler implementation="com.google.idea.gn.GnTypedHandler"/>
+    <lang.braceMatcher implementationClass="com.google.idea.gn.GnBraceMatcher"
+        language="gn"/>
+    <lang.formatter language="gn"
+        implementationClass="com.google.idea.gn.GnFormattingBuilder"/>
+    <enterBetweenBracesDelegate implementationClass="com.google.idea.gn.GnEnterDelegate" language="gn"/>
+  </extensions>
+
+
+  <actions>
+    <!-- Add your actions here -->
+  </actions>
+</idea-plugin>
