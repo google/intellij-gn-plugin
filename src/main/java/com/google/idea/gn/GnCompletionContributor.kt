@@ -19,6 +19,7 @@ import com.intellij.openapi.vfs.VfsUtilCore
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.VirtualFileVisitor
 import com.intellij.patterns.PlatformPatterns
+import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiManager
 import com.intellij.util.ProcessingContext
 import com.intellij.util.text.Matcher
@@ -30,6 +31,8 @@ class GnCompletionContributor : CompletionContributor() {
     context.dummyIdentifier = ""
     context.replacementOffset = 0
   }
+
+  enum class CompleteType { TARGET, DIRECTORY, FILE }
 
   private class FileCompletionProvider @JvmOverloads constructor(private val mFileMatcher: Matcher, private val skipFileName: Boolean = false, private val parseTargets: Boolean = false) : CompletionProvider<CompletionParameters>() {
     override fun addCompletions(parameters: CompletionParameters,
@@ -102,13 +105,26 @@ class GnCompletionContributor : CompletionContributor() {
               val state = stack.pop()
               if (state.foundBuildFile) {
                 if (!state.foundNamedTarget) {
-                  result.addElement(
-                      LookupElementBuilder.create(getPath(file)).withIcon(AllIcons.Nodes.Folder))
+                  val path = getPath(file)
+                  if (path.isNotEmpty()) {
+                    result.addElement(createElementBuilderWithIcon(getPath(file), CompleteType.DIRECTORY))
+                  }
                 }
                 if (!stack.empty()) {
                   stack.peek().foundBuildFile = true
                 }
               }
+            }
+
+            private fun createElementBuilderWithIcon(lookup: String, type: CompleteType, file: PsiFile? = null): LookupElementBuilder {
+              val elementBuilder = LookupElementBuilder.create(lookup)
+              elementBuilder.putUserData(GnKeys.LOOKUP_ITEM_TYPE, type)
+              val icon = when (type) {
+                CompleteType.TARGET -> AllIcons.Nodes.Target
+                CompleteType.DIRECTORY -> AllIcons.Nodes.Folder
+                CompleteType.FILE -> file?.getIcon(0)
+              } ?: return elementBuilder
+              return elementBuilder.withIcon(icon)
             }
 
             override fun visitFile(_file: VirtualFile): Boolean {
@@ -150,15 +166,13 @@ class GnCompletionContributor : CompletionContributor() {
                   } else {
                     suggestion = "$basePath:$target"
                   }
-                  result
-                      .addElement(LookupElementBuilder.create(suggestion).withIcon(AllIcons.Nodes.Target))
+                  if (suggestion.isNotEmpty()) {
+                    result
+                        .addElement(createElementBuilderWithIcon(suggestion, CompleteType.TARGET))
+                  }
                 }
               } else {
-                var element = LookupElementBuilder.create(basePath)
-                manager.findFile(file)?.let {
-                  element = element.withIcon(it.getIcon(0))
-                }
-                result.addElement(element)
+                result.addElement(createElementBuilderWithIcon(basePath, CompleteType.FILE, manager.findFile(file)))
               }
               return false
             }
