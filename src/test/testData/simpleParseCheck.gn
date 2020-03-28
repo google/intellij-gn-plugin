@@ -1,0 +1,41 @@
+# Copyright (c) 2020 Google LLC All rights reserved.
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+import("//thing")
+
+global = x
+
+# Test syntax rules for parser.
+group("my_group") {
+  a = 0
+  a += 1
+  a -= 1
+  b = ["a"]
+  b += "b"
+  b -= "b"
+  c = a && b
+  c = a || b
+  c = a + b
+  c = a - b
+  c = !a
+  c = a + b + d
+  c = a + b + !d
+  if(c) {
+    do_thing()
+  }
+  if(a == 1) {
+    v = 0
+  } else if (a != 3 && (b != 2 && c == 0)) {
+    v = 1
+  } else {
+    v = [ b + "i",]
+  }
+  c = true
+  c = false
+  c = []
+  c = {}
+  c = {
+    i = 0
+  }
+}
