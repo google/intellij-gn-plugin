@@ -38,4 +38,9 @@ group("my_group") {
   c = {
     i = 0
   }
+
+  identifier = "abc$identifier abc"
+  brackets = "abc${identifier}abc"
+  scope_access = "abc${identifier.field}abc"
+  array_access = "abc${identifier[3]}aeaf"
 }

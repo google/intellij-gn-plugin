@@ -19,7 +19,7 @@ class GnLabelReference(element: PsiElement, private val label: GnLabel) : PsiRef
       return file
     }
     val scope = file.scope
-    val t = label.target?.let{ scope.getTarget(it) }
+    val t = label.target?.let { scope.getTarget(it) }
     return if (t?.call == null)
       file
     else t.call

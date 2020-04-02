@@ -14,5 +14,6 @@ object Builtin {
     arrayOf(Group(), SourceSet(), Executable(), Import(),
         Template()).associateBy { it.name }
   }
+
   fun isBuiltIn(element: PsiElement): Boolean = FUNCTIONS.containsKey(element.text)
 }

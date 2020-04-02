@@ -50,7 +50,7 @@ class GnLabel private constructor() {
 
     @kotlin.jvm.JvmStatic
     fun parse(path: String?): GnLabel? {
-      if(path.isNullOrEmpty()) {
+      if (path.isNullOrEmpty()) {
         return null
       }
       val out = GnLabel()

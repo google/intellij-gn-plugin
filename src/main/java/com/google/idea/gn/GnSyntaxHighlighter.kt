@@ -17,6 +17,7 @@ class GnSyntaxHighlighter : SyntaxHighlighterBase() {
 
   override fun getTokenHighlights(tokenType: IElementType): Array<TextAttributesKey> =
       when (tokenType) {
+        Types.QUOTE,
         Types.STRING_LITERAL -> STRING_KEYS
         Types.CALL -> FUNCTION_CALL_KEYS
         Types.COMMENT -> COMMENT_KEYS

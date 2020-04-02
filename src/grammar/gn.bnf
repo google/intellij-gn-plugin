@@ -88,9 +88,17 @@ or_expr ::= expr OR expr
 not-equal_expr ::= expr NOT_EQUAL expr
 paren_expr ::= OPAREN expr CPAREN
 
-literal_expr ::= STRING_LITERAL | INTEGRAL_LITERAL | TRUE | FALSE {
+string_literal_expr ::= STRING_LITERAL
+string_hex ::= DOLLAR HEX_BYTE
+string_ident ::= DOLLAR id
+string_expand ::= DOLLAR OBRACE (array-access | scope-access | id) CBRACE
+string_inner ::= string_literal_expr | string_expand | string_hex | string_ident
+string_expr ::= QUOTE (string_inner)* QUOTE {
   mixin="GnLiteralReferenceImpl"
 }
+
+literal_expr ::= string_expr | INTEGRAL_LITERAL | TRUE | FALSE
+
 primary_expr ::= literal_expr | call | array-access | scope-access | block | paren_expr | collection | id
 
 

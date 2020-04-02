@@ -43,7 +43,8 @@
         language="gn"/>
     <lang.formatter language="gn"
         implementationClass="com.google.idea.gn.GnFormattingBuilder"/>
-    <enterBetweenBracesDelegate implementationClass="com.google.idea.gn.GnEnterDelegate" language="gn"/>
+    <enterBetweenBracesDelegate implementationClass="com.google.idea.gn.GnEnterDelegate"
+        language="gn"/>
   </extensions>
 
 

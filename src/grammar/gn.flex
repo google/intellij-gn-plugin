@@ -49,25 +49,31 @@ LESSER="<"
 GREATER=">"
 AND="&&"
 OR="||"
+DOLLAR="$"
 QUOTE=\"
 
 // Literals
 TRUE="true"
 FALSE="false"
-STRING_LITERAL=\"([^\"\\]|\\.)*\"*
-INTEGRAL_LITERAL=[+-]?[0-9]+
 
+STRING_LITERAL=((\\.)|[^\$\"\n\\])+
+INTEGRAL_LITERAL=[-]?[0-9]+
+HEX_BYTE="0x"[0-9a-fA-F]{2}
 IDENTIFIER=[:letter:][a-zA-Z_0-9]*
 COMMENT="#".*
 
+%state STRING
+%state STRING_EXPR
+%state STRING_DOLLAR
+
 %%
 
-<YYINITIAL> {
+<YYINITIAL, STRING_EXPR> {
   {WHITE_SPACE} { return WHITE_SPACE; }
   {IF} { return IF; }
   {ELSE} { return ELSE; }
   {OBRACE} { return OBRACE; }
-  {CBRACE} { return CBRACE; }
+  {CBRACE} { if(yystate() == STRING_EXPR) { yybegin(STRING); } return CBRACE; }
   {DOT} { return DOT; }
   {COMMA} { return COMMA; }
   {OPAREN} { return OPAREN; }
@@ -90,9 +96,25 @@ COMMENT="#".*
   {OR} { return OR; }
   {TRUE} { return TRUE; }
   {FALSE} { return FALSE; }
-  {STRING_LITERAL} { return STRING_LITERAL; }
+  {QUOTE} { yybegin(STRING); return QUOTE; }
   {INTEGRAL_LITERAL} { return INTEGRAL_LITERAL; }
   {IDENTIFIER} { return IDENTIFIER; }
   {COMMENT} { return COMMENT; }
-[^] { return BAD_CHARACTER; }
+[^] { if(yystate() == STRING_EXPR){ yybegin(STRING); } return BAD_CHARACTER; }
+}
+
+
+<STRING_DOLLAR> {
+  {HEX_BYTE} { yybegin(STRING); return HEX_BYTE; }
+  {OBRACE} { yybegin(STRING_EXPR); return OBRACE; }
+  {IDENTIFIER} { yybegin(STRING); return IDENTIFIER; }
+[^] { yybegin(STRING); return BAD_CHARACTER; }
+}
+
+<STRING> {
+   {QUOTE} { yybegin(YYINITIAL); return QUOTE; }
+   {STRING_LITERAL} { return STRING_LITERAL; }
+   {DOLLAR} { yybegin(STRING_DOLLAR); return DOLLAR; }
+   {IDENTIFIER} { return IDENTIFIER; }
+[^] { yybegin(YYINITIAL); return BAD_CHARACTER; }
 }

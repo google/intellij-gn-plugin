@@ -6,7 +6,7 @@ package com.google.idea.gn
 import com.intellij.openapi.fileTypes.LanguageFileType
 import javax.swing.Icon
 
-object GnFileType: LanguageFileType(GnLanguage) {
+object GnFileType : LanguageFileType(GnLanguage) {
   override fun getName(): String {
     return "GN"
   }

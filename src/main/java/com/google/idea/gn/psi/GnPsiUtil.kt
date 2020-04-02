@@ -8,14 +8,15 @@ import com.google.idea.gn.psi.scope.Scope
 import com.intellij.openapi.project.guessProjectDir
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFile
-import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiManager
+import java.io.StringWriter
 
 object GnPsiUtil {
   fun evaluate(expr: GnExpr, scope: Scope): GnValue? =
       when (expr) {
-        is GnLiteralExpr -> evaluateLiteral(expr)
+        is GnStringExpr -> evaluateStringExpr(expr, scope)
+        is GnLiteralExpr -> evaluateLiteral(expr, scope)
         is GnPrimaryExpr -> evaluatePrimary(expr, scope)
         else -> null
       }
@@ -30,11 +31,26 @@ object GnPsiUtil {
     return null
   }
 
-  private fun evaluateLiteral(literal: GnLiteralExpr): GnValue? {
+  private fun evaluateStringInner(inner: GnStringInner, scope: Scope): String? {
+    inner.stringLiteralExpr?.let { literal ->
+      return literal.text
+    }
+    return null
+  }
+
+  private fun evaluateStringExpr(expr: GnStringExpr, scope: Scope): GnValue? {
+    val writer = StringWriter()
+    for (inner in expr.stringInnerList) {
+      val s = evaluateStringInner(inner, scope) ?: return null
+      writer.append(s)
+    }
+    return GnValue(writer.toString())
+  }
+
+  private fun evaluateLiteral(literal: GnLiteralExpr, scope: Scope): GnValue? {
     val def = literal.firstChild
-    if (def != null && Types.STRING_LITERAL == def.node.elementType) {
-      val text = getUnquotedText(def)
-      return GnValue(text)
+    when (def) {
+      is GnStringExpr -> return evaluateStringExpr(def, scope);
     }
     return null
   }
@@ -72,16 +88,5 @@ object GnPsiUtil {
     } else {
       labelLocation.originalFile.virtualFile.parent
     }?.let { VfsUtil.findRelativeFile(it, *label.parts) }
-  }
-
-  fun getUnquotedText(element: PsiElement): String {
-    var text = element.text
-    if (text.startsWith("\"")) {
-      text = text.substring(1)
-    }
-    if (text.endsWith("\"")) {
-      text = text.substring(0, text.length - 1)
-    }
-    return text
   }
 }

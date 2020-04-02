@@ -40,6 +40,9 @@ class TokenType(@NonNls debugName: String) : IElementType(debugName, GnLanguage)
         Types.STRING_LITERAL -> "String literal"
         Types.TRUE -> "true"
         Types.UNARY_NOT -> "!"
+        Types.DOLLAR -> "$"
+        Types.HEX_BYTE -> "Hex expression"
+        Types.QUOTE -> "quote"
         else -> "TokenType." + super.toString()
       }
 

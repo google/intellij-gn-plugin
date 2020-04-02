@@ -12,6 +12,7 @@ import com.intellij.codeInsight.completion.*
 import com.intellij.codeInsight.completion.impl.CamelHumpMatcher
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.icons.AllIcons
+import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.project.guessProjectDir
 import com.intellij.openapi.vfs.VfsUtil
@@ -27,8 +28,15 @@ import java.io.StringWriter
 import java.util.*
 
 class GnCompletionContributor : CompletionContributor() {
+
+  companion object {
+    val LOGGER = Logger.getInstance(GnCompletionContributor::class.toString())
+    const val DUMMY_ID = "__gn_dummy__"
+  }
+
+
   override fun beforeCompletion(context: CompletionInitializationContext) {
-    context.dummyIdentifier = ""
+    context.dummyIdentifier = DUMMY_ID
     context.replacementOffset = 0
   }
 
@@ -45,6 +53,7 @@ class GnCompletionContributor : CompletionContributor() {
       if (text.endsWith("\"")) {
         text = text.substring(0, text.length - 1)
       }
+      text = text.replace(DUMMY_ID, "", false)
       result = result.withPrefixMatcher(CamelHumpMatcher(text, true))
       val path: GnLabel? = GnLabel.parse(text)
       var dir: VirtualFile? = null
@@ -190,6 +199,7 @@ class GnCompletionContributor : CompletionContributor() {
   }
 
   init {
+    // Complete DEPS and PUBLIC_DEPS.
     extend(CompletionType.BASIC,
         PlatformPatterns.psiElement(Types.STRING_LITERAL)
             .withAncestor(10,
@@ -200,13 +210,19 @@ class GnCompletionContributor : CompletionContributor() {
                 )
             ), FileCompletionProvider(Matcher { name: String -> name == GnFile.BUILD_FILE }, skipFileName = true, parseTargets = true)
     )
+
+    // Complete imports.
     extend(CompletionType.BASIC, PlatformPatterns.psiElement(Types.STRING_LITERAL)
         .withSuperParent(2, PlatformPatterns.psiElement(Types.CALL)
             .withFirstNonWhitespaceChild(PlatformPatterns.psiElement(Types.ID).withText(
                 Import.NAME))), FileCompletionProvider(Matcher { name: String -> name.endsWith(GnFile.GNI) }))
+
+    // Complete sources.
     extend(CompletionType.BASIC, PlatformPatterns.psiElement(Types.STRING_LITERAL).withAncestor(10,
         PlatformPatterns.psiElement(Types.ASSIGNMENT)
             .withFirstChild(PlatformPatterns.psiElement(Types.LVALUE).withText(Builtin.SOURCES))),
         FileCompletionProvider(Matcher { true }))
   }
+
+
 }

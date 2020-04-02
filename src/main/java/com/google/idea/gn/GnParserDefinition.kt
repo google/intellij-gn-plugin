@@ -54,7 +54,7 @@ class GnParserDefinition : ParserDefinition {
   companion object {
     val WHITE_SPACES = TokenSet.create(TokenType.WHITE_SPACE)
     val COMMENTS = TokenSet.create(Types.COMMENT)
-    val STRING_LITERALS = TokenSet.create(Types.STRING_LITERAL)
+    val STRING_EXPR = TokenSet.create(Types.QUOTE, Types.STRING_LITERAL)
     val FILE = IFileElementType(GnLanguage)
   }
 }

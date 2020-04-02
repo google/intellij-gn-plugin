@@ -4,19 +4,23 @@
 package com.google.idea.gn.psi.impl
 
 import com.google.idea.gn.GnLabel
+import com.google.idea.gn.psi.GnFile
 import com.google.idea.gn.psi.GnLabelReference
 import com.google.idea.gn.psi.GnPsiUtil
-import com.google.idea.gn.psi.Types
+import com.google.idea.gn.psi.GnStringExpr
 import com.intellij.extapi.psi.ASTWrapperPsiElement
 import com.intellij.lang.ASTNode
 import com.intellij.psi.PsiReference
 
-abstract class GnLiteralReferenceImpl(node: ASTNode) : ASTWrapperPsiElement(node) {
+abstract class GnLiteralReferenceImpl(node: ASTNode) : ASTWrapperPsiElement(node), GnStringExpr {
   override fun getReference(): PsiReference? {
-    if (firstChild.node.elementType != Types.STRING_LITERAL) {
-      return null
+    val file = containingFile
+    val scope = when (file) {
+      is GnFile -> file.scope
+      else -> return null
     }
-    val label: GnLabel = GnLabel.parse(GnPsiUtil.getUnquotedText(firstChild))
+    val value = GnPsiUtil.evaluate(this, scope)?.string ?: return null;
+    val label: GnLabel = GnLabel.parse(value)
         ?: return null
     return GnLabelReference(this, label)
   }

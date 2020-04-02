@@ -5,4 +5,4 @@ package com.google.idea.gn
 
 import com.intellij.codeInsight.editorActions.SimpleTokenSetQuoteHandler
 
-class GnQuoteHandler : SimpleTokenSetQuoteHandler(GnParserDefinition.STRING_LITERALS)
+class GnQuoteHandler : SimpleTokenSetQuoteHandler(GnParserDefinition.STRING_EXPR)
