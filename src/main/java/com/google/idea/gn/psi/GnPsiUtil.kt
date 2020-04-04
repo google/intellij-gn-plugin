@@ -4,6 +4,7 @@
 package com.google.idea.gn.psi
 
 import com.google.idea.gn.GnLabel
+import com.google.idea.gn.psi.scope.BlockScope
 import com.google.idea.gn.psi.scope.Scope
 import com.intellij.openapi.project.guessProjectDir
 import com.intellij.openapi.vfs.VfsUtil
@@ -18,15 +19,63 @@ object GnPsiUtil {
         is GnStringExpr -> evaluateStringExpr(expr, scope)
         is GnLiteralExpr -> evaluateLiteral(expr, scope)
         is GnPrimaryExpr -> evaluatePrimary(expr, scope)
+        is GnUnaryExpr -> evaluateUnaryNot(expr, scope)
+        is GnBinaryExpr -> expr.evaluate(scope)
         else -> null
       }
 
-
   private fun evaluatePrimary(expr: GnPrimaryExpr, scope: Scope): GnValue? {
-    val id = expr.id
-    if (id != null) {
+    expr.id?.let { id ->
       val v = scope.getVariable(id.text) ?: return null
       return v.value
+    }
+    expr.scopeAccess?.let { scopeAccess ->
+      return evaluateScopeAccess(scopeAccess, scope)
+    }
+    expr.arrayAccess?.let { arrayAccess ->
+      return evaluateArrayAccess(arrayAccess, scope)
+    }
+    expr.collection?.let { collection ->
+      return evaluateCollection(collection, scope)
+    }
+    expr.block?.let { block ->
+      val blockScope = BlockScope(scope)
+      block.accept(Visitor(blockScope))
+      return blockScope.intoValue()
+    }
+    return null
+  }
+
+  private fun evaluateCollection(collection: GnCollection, scope: Scope): GnValue? {
+    return GnValue(collection.exprList.exprList.map { evaluate(it, scope) ?: return null })
+  }
+
+  private fun evaluateUnaryNot(expr: GnUnaryExpr, scope: Scope): GnValue? {
+    return expr.expr?.let { inner -> evaluate(inner, scope)?.bool?.let { b -> GnValue(!b) } }
+  }
+
+  private fun evaluateArrayAccess(access: GnArrayAccess, scope: Scope): GnValue? {
+    val id = access.id.text
+    val index = evaluate(access.expr, scope)?.int ?: return null
+    val list = scope.getVariable(id)?.value?.list ?: return null
+    if (index < list.size) {
+      return list[index]
+    }
+    return null
+  }
+
+  private fun evaluateScopeAccess(access: GnScopeAccess, scope: Scope): GnValue? {
+    val left = access.idList[0]
+    val right = access.idList[1]
+    return scope.getVariable(left.text)?.value?.scope?.get(right.text)
+  }
+
+  private fun evaluateStringExpand(expand: GnStringExpand, scope: Scope): String? {
+    expand.id?.let { ident ->
+      return scope.getVariable(ident.text)?.value?.string
+    }
+    expand.scopeAccess?.let { scopeAccess ->
+      return evaluateScopeAccess(scopeAccess, scope)?.string
     }
     return null
   }
@@ -34,6 +83,15 @@ object GnPsiUtil {
   private fun evaluateStringInner(inner: GnStringInner, scope: Scope): String? {
     inner.stringLiteralExpr?.let { literal ->
       return literal.text
+    }
+    inner.stringIdent?.let { ident ->
+      return scope.getVariable(ident.id.text)?.value?.string
+    }
+    inner.stringHex?.let { hex ->
+      return hex.node.findChildByType(Types.HEX_BYTE)?.text?.substring(2)?.toInt(16)?.toChar()?.toString()
+    }
+    inner.stringExpand?.let { expand ->
+      return evaluateStringExpand(expand, scope)
     }
     return null
   }
@@ -49,10 +107,19 @@ object GnPsiUtil {
 
   private fun evaluateLiteral(literal: GnLiteralExpr, scope: Scope): GnValue? {
     val def = literal.firstChild
-    when (def) {
-      is GnStringExpr -> return evaluateStringExpr(def, scope);
+    if (def is GnStringExpr) {
+      return evaluateStringExpr(def, scope);
     }
-    return null
+    return when (def.node.elementType) {
+      Types.TRUE -> GnValue(true)
+      Types.FALSE -> GnValue(false)
+      Types.INTEGRAL_LITERAL -> try {
+        GnValue(def.text.toInt())
+      } catch (_e: NumberFormatException) {
+        null
+      }
+      else -> null
+    }
   }
 
   fun evaluateFirst(exprList: GnExprList, scope: Scope): GnValue? {

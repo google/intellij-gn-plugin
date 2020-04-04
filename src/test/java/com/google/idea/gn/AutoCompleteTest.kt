@@ -5,29 +5,14 @@
 package com.google.idea.gn
 
 import com.google.idea.gn.psi.GnFile
+import com.google.idea.gn.util.GnCodeInsightTestCase
 import com.intellij.codeInsight.completion.CodeCompletionHandlerBase
 import com.intellij.codeInsight.completion.CompletionType
 import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.codeInsight.lookup.LookupManager
-import com.intellij.openapi.application.runWriteAction
-import com.intellij.openapi.project.guessProjectDir
-import com.intellij.openapi.vfs.VfsUtil
-import com.intellij.openapi.vfs.VirtualFile
-import com.intellij.testFramework.LightPlatformCodeInsightTestCase
 import com.intellij.testFramework.fixtures.impl.CodeInsightTestFixtureImpl
 
-class AutoCompleteTest : LightPlatformCodeInsightTestCase() {
-  override fun getTestDataPath() = "src/test/testData/project/"
-
-  private fun copyTestFiles(filter: (VirtualFile) -> Boolean) {
-    runWriteAction {
-      VfsUtil.copyDirectory(this, getVirtualFile(""), project.guessProjectDir()!!, filter)
-    }
-  }
-
-  private fun copyTestFilesByPath(filter: (String) -> Boolean) {
-    copyTestFiles { filter(VfsUtil.getRelativePath(it, getVirtualFile(""))!!) }
-  }
+class AutoCompleteTest : GnCodeInsightTestCase() {
 
   fun testLabelCompletion() {
     copyTestFilesByPath {

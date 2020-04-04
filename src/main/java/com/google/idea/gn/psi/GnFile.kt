@@ -30,11 +30,20 @@ class GnFile(viewProvider: FileViewProvider) : PsiFileBase(viewProvider, GnLangu
 
   val scope: Scope
     get() = CachedValuesManager.getCachedValue(this, CACHE_KEY) {
-      val fileScope: Scope = FileScope()
-      val visitor = Visitor(fileScope)
-      accept(visitor)
+      val fileScope = buildScope()
       CachedValueProvider.Result(fileScope, ModificationTracker.NEVER_CHANGED)
     }
+
+  fun buildScope(injected: Map<String, GnValue>? = null): Scope {
+    val fileScope = FileScope();
+    injected?.let {
+      for ((k, v) in it) {
+        fileScope.addVariable(Variable(k, v))
+      }
+    }
+    accept(Visitor(fileScope))
+    return fileScope
+  }
 
   companion object {
     const val BUILD_FILE = "BUILD.gn"

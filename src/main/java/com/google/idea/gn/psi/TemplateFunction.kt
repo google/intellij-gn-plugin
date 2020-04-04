@@ -8,22 +8,24 @@ import com.google.idea.gn.psi.scope.BlockScope
 import com.google.idea.gn.psi.scope.Scope
 import com.google.idea.gn.psi.scope.TemplateScope
 
-class TemplateFunction(override val name: String, private val mBlock: GnBlock) : Function() {
+class TemplateFunction(override val name: String, private val block: GnBlock) : Function() {
   override fun execute(call: GnCall, targetScope: Scope) {
     val executionScope: BlockScope = TemplateScope(targetScope, call)
+
     executionScope.addVariable(
         Variable(Template.TARGET_NAME,
             GnPsiUtil.evaluateFirst(call.exprList, targetScope)))
-    val block = call.block
-    if (block != null) {
+
+    call.block?.let { block ->
       val innerScope: Scope = BlockScope(targetScope)
       Visitor(innerScope).visitBlock(block)
-      if (innerScope.variables != null) {
+      innerScope.consolidateVariables()?.let {
         executionScope
-            .addVariable(Variable(Template.INVOKER, GnValue(innerScope.variables)))
+            .addVariable(Variable(Template.INVOKER, GnValue(it)))
       }
     }
-    Visitor(executionScope).visitBlock(mBlock)
+
+    Visitor(BlockScope(executionScope)).visitBlock(this.block)
   }
 
   override val isBuiltin: Boolean

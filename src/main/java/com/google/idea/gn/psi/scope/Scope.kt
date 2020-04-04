@@ -3,10 +3,9 @@
 //  license that can be found in the LICENSE file.
 package com.google.idea.gn.psi.scope
 
+import com.google.idea.gn.psi.*
 import com.google.idea.gn.psi.Function
-import com.google.idea.gn.psi.GnCall
 import com.google.idea.gn.psi.Target
-import com.google.idea.gn.psi.Variable
 import java.util.*
 
 abstract class Scope protected constructor(val parent: Scope?) {
@@ -44,6 +43,14 @@ abstract class Scope protected constructor(val parent: Scope?) {
 
   open val callSite: GnCall?
     get() = parent?.callSite
+
+  fun consolidateVariables(): Map<String, GnValue>? {
+    val map = variables?.filterValues { it.value != null }?.mapValues { it.value.value!! }
+    if (map.isNullOrEmpty()) {
+      return null
+    }
+    return map
+  }
 
   private var _variables: MutableMap<String, Variable>? = null
 

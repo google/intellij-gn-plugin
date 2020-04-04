@@ -3,7 +3,6 @@
 //  license that can be found in the LICENSE file.
 package com.google.idea.gn.psi
 
-import com.google.idea.gn.psi.Visitor.AssignType
 import com.google.idea.gn.psi.scope.BlockScope
 import com.google.idea.gn.psi.scope.Scope
 import com.intellij.psi.PsiFile
@@ -24,18 +23,18 @@ class Visitor(scope: Scope) : GnVisitor() {
   }
 
   override fun visitStatement(statement: GnStatement) {
-    val call = statement.call
-    if (call != null) {
-      visitCall(call)
+    statement.call?.let {
+      visitCall(it)
       return
     }
-    val assignment = statement.assignment
-    if (assignment != null) {
-      visitAssignment(assignment)
+    statement.assignment?.let {
+      visitAssignment(it)
       return
     }
-    val condition = statement.condition
-    condition?.let { visitCondition(it) }
+    statement.condition?.let {
+      visitCondition(it)
+      return
+    }
   }
 
   override fun visitCall(call: GnCall) {
@@ -44,7 +43,7 @@ class Visitor(scope: Scope) : GnVisitor() {
   }
 
   override fun visitBlock(block: GnBlock) {
-    scope = BlockScope(scope)
+    assert(scope is BlockScope)
     visitStatementList(block.statementList)
     scope = scope.parent!!
   }
@@ -66,38 +65,98 @@ class Visitor(scope: Scope) : GnVisitor() {
   }
 
   override fun visitAssignment(assignment: GnAssignment) {
-    val lvalue = assignment.lvalue
-    val type = AssignType.fromNode(assignment.assignOp.firstChild.node.elementType)
-    if (lvalue.id != null) { // Id assignment
-      val varName = lvalue.id!!.text
-      var v = scope.getVariable(varName)
-      if (v == null) {
-        if (type != AssignType.EQUAL) { // We don't know this variable.
-          return
-        }
-        v = Variable(varName)
-        scope.addVariable(v)
-      }
-      if (type == AssignType.EQUAL) {
-        v.value = GnPsiUtil.evaluate(assignment.expr, scope)
-      }
+    val type = AssignType.fromNode(assignment.assignOp.firstChild.node.elementType) ?: return
+    val target = createAssignmentTarget(assignment.lvalue, type) ?: return
+    val result = GnPsiUtil.evaluate(assignment.expr, scope)
+
+    target.variableValue = when (type) {
+      AssignType.EQUAL -> result
+      AssignType.PLUS_EQUAL -> result?.let { target.variableValue?.plusEqual(it) }
+      AssignType.MINUS_EQUAL -> result?.let { target.variableValue?.minusEqual(it) }
     }
   }
+
+  private interface AssignmentTarget {
+    var variableValue: GnValue?
+  }
+
+  private class IdAssignmentTarget(val name: String, val scope: Scope, val loose: Boolean) : AssignmentTarget {
+    override var variableValue: GnValue?
+      get() = scope.getVariable(name)?.value
+      set(value) {
+        scope.getVariable(name)?.let { v ->
+          v.value = value
+          return
+        }
+        // Allow declaration if variable does not exist.
+        if (loose) {
+          scope.addVariable(Variable(name, value))
+        }
+      }
+  }
+
+  private class ScopeAccessAssignmentTarget(val variable: Variable,
+                                            val fieldAccess: String,
+                                            val loose: Boolean) : AssignmentTarget {
+    override var variableValue: GnValue?
+      get() = variable.value?.scope?.get(fieldAccess)
+      set(value) {
+        value?.let { v ->
+          val scope = variable.value?.scope ?: return
+          if (loose || scope.containsKey(fieldAccess)) {
+            variable.value = GnValue(scope.plus(Pair(fieldAccess, v)))
+          }
+        }
+      }
+  }
+
+  private class ArrayAssignmentTarget(val variable: Variable,
+                                      val index: Int) : AssignmentTarget {
+    override var variableValue: GnValue?
+      get() = variable.value?.list?.get(index)
+      set(value) {
+        value?.let { replace ->
+          variable.value?.list?.let { list ->
+            variable.value = GnValue(list.mapIndexed { i, v -> if (i == index) replace else v })
+          }
+        }
+      }
+  }
+
+  private fun createAssignmentTarget(lvalue: GnLvalue, type: AssignType): AssignmentTarget? {
+    val loose = type == AssignType.EQUAL
+    lvalue.id?.let { return IdAssignmentTarget(it.text, scope, loose) }
+    lvalue.scopeAccess?.let { scopeAccess ->
+      val first = scopeAccess.idList[0].text
+      val second = scopeAccess.idList[1].text
+      val variable = scope.getVariable(first) ?: return null
+      variable.value?.scope ?: return null
+      return ScopeAccessAssignmentTarget(variable, second, loose)
+    }
+    lvalue.arrayAccess?.let { arrayAccess ->
+      val first = arrayAccess.id.text
+      val variable = scope.getVariable(first) ?: return null
+      val index = GnPsiUtil.evaluate(arrayAccess.expr, scope)?.int ?: return null
+      if (index >= variable.value?.list?.size ?: 0) {
+        return null
+      }
+      return ArrayAssignmentTarget(variable, index)
+    }
+    return null
+  }
+
 
   private enum class AssignType {
     EQUAL, PLUS_EQUAL, MINUS_EQUAL;
 
     companion object {
       fun fromNode(type: IElementType): AssignType? {
-        if (Types.EQUAL == type) {
-          return EQUAL
+        return when (type) {
+          Types.EQUAL -> EQUAL
+          Types.PLUS_EQUAL -> PLUS_EQUAL
+          Types.MINUS_EQUAL -> MINUS_EQUAL
+          else -> null
         }
-        if (Types.PLUS_EQUAL == type) {
-          return PLUS_EQUAL
-        }
-        return if (Types.MINUS_EQUAL == type) {
-          MINUS_EQUAL
-        } else null
       }
     }
   }
