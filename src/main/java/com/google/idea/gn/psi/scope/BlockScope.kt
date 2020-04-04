@@ -16,7 +16,7 @@ open class BlockScope(parent: Scope?) : Scope(parent) {
   }
 
   fun intoValue(): GnValue? {
-    return consolidateVariables()?.let{ GnValue(it) }
+    return consolidateVariables()?.let { GnValue(it) }
   }
 
   private val functions: MutableMap<String, Function> = HashMap()

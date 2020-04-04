@@ -101,14 +101,7 @@ class GnValue {
     if (other !is GnValue) {
       return false
     }
-    when (value) {
-      is String -> return other.string == value
-      is Boolean -> return other.bool == value
-      is Int -> return other.int == value
-    }
-    list?.let { l -> return other.list?.let { r -> l == r } ?: false }
-    scope?.let { l -> return other.scope?.let { r -> l == r } ?: false }
-    return false
+    return value == other.value
   }
 
   override fun toString(): String = "GnValue($value)"

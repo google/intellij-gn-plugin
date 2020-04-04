@@ -10,7 +10,7 @@ import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.testFramework.LightPlatformCodeInsightTestCase
 
-abstract class GnCodeInsightTestCase: LightPlatformCodeInsightTestCase() {
+abstract class GnCodeInsightTestCase : LightPlatformCodeInsightTestCase() {
   override fun getTestDataPath() = "src/test/testData/project/"
 
   fun copyTestFiles(filter: (VirtualFile) -> Boolean) {
