@@ -382,5 +382,12 @@ class ExprTest : GnCodeInsightTestCase() {
     assertEquals(mapOf("a" to "z", "b" to "yz", "c" to "cee").mapValues { GnValue(it.value) }, result.value)
   }
 
+  fun testOperatorPrecedence() {
+    val result = executeAndGetTestVar("""
+      $TEST_VAR = 2 + 3 - 4 == 1 && 2 + 3 > 1 + 1 || 3 + 2 != 1 + 2"
+    """)
+    assertEquals(true, result.value)
+  }
+
 
 }

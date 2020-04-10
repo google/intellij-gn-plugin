@@ -69,7 +69,7 @@ array-access ::= id OBRACKET expr CBRACKET
 scope-access ::= id DOT id
 
 
-expr ::= add-group | compare-group | equality-group | and_expr | or_expr | unary_expr | primary_expr | literal_expr
+expr ::= and_expr | or_expr | equality-group | compare-group | add-group |  unary_expr | primary_expr | literal_expr
 
 private add-group ::= plus_expr | minus_expr
 private compare-group ::= lt_expr | le_expr | gt_expr | ge_expr

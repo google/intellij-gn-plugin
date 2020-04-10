@@ -6,6 +6,7 @@ package com.google.idea.gn.psi
 import com.google.idea.gn.GnLabel
 import com.google.idea.gn.psi.scope.BlockScope
 import com.google.idea.gn.psi.scope.Scope
+import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.project.guessProjectDir
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFile
@@ -14,15 +15,23 @@ import com.intellij.psi.PsiManager
 import java.io.StringWriter
 
 object GnPsiUtil {
-  fun evaluate(expr: GnExpr, scope: Scope): GnValue? =
-      when (expr) {
-        is GnStringExpr -> evaluateStringExpr(expr, scope)
-        is GnLiteralExpr -> evaluateLiteral(expr, scope)
-        is GnPrimaryExpr -> evaluatePrimary(expr, scope)
-        is GnUnaryExpr -> evaluateUnaryNot(expr, scope)
-        is GnBinaryExpr -> expr.evaluate(scope)
-        else -> null
-      }
+
+  val LOGGER = Logger.getInstance(GnPsiUtil.javaClass)
+
+  fun evaluate(expr: GnExpr, scope: Scope): GnValue? {
+    LOGGER.debug("evaluating $expr [${expr.text}]")
+    val result = when (expr) {
+      is GnStringExpr -> evaluateStringExpr(expr, scope)
+      is GnLiteralExpr -> evaluateLiteral(expr, scope)
+      is GnPrimaryExpr -> evaluatePrimary(expr, scope)
+      is GnUnaryExpr -> evaluateUnaryNot(expr, scope)
+      is GnBinaryExpr -> expr.evaluate(scope)
+      else -> null
+    }
+
+    LOGGER.debug("evaluating $expr = $result [${expr.text}]")
+    return result
+  }
 
   private fun evaluatePrimary(expr: GnPrimaryExpr, scope: Scope): GnValue? {
     expr.id?.let { id ->

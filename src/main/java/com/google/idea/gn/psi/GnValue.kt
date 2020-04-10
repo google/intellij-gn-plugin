@@ -30,16 +30,10 @@ class GnValue {
     get() = tryCast<String>()
 
   val int: Int?
-    get() {
-      tryCast<Int>()?.let { return it }
-      return tryCast<Boolean>()?.let { if (it) 1 else 0 }
-    }
+    get() = tryCast<Int>()
 
-  val bool: Boolean
-    get() {
-      tryCast<Boolean>()?.let { return it }
-      return tryCast<Int>()?.let { it != 0 } ?: false
-    }
+  val bool: Boolean?
+    get() = tryCast<Boolean>()
 
   private inline fun <reified T> tryCast(): T? {
     if (value is T) {
@@ -55,8 +49,8 @@ class GnValue {
     get() = tryCast<List<GnValue>>()
 
 
-  fun and(other: GnValue): GnValue? = GnValue(bool && other.bool)
-  fun or(other: GnValue): GnValue? = GnValue(bool || other.bool)
+  fun and(other: GnValue): GnValue? = bool?.let { l -> other.bool?.let{ r -> GnValue(r && l) } }
+  fun or(other: GnValue): GnValue? = bool?.let { l -> other.bool?.let{ r -> GnValue(r || l) } }
   fun greaterThan(other: GnValue): GnValue? = int?.let { l -> other.int?.let { r -> GnValue(l > r) } }
   fun greaterThanOrEqual(other: GnValue): GnValue? = int?.let { l -> other.int?.let { r -> GnValue(l >= r) } }
   fun lessThan(other: GnValue): GnValue? = int?.let { l -> other.int?.let { r -> GnValue(l < r) } }

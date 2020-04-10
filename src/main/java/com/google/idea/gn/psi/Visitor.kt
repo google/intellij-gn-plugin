@@ -50,7 +50,7 @@ class Visitor(scope: Scope) : GnVisitor() {
 
   override fun visitCondition(condition: GnCondition) {
     val result: GnValue? = GnPsiUtil.evaluate(condition.expr, scope)
-    if (result != null && result.bool) { // Visit statement list directly, there's no scope created by condition blocks.
+    if (result?.bool == true) { // Visit statement list directly, there's no scope created by condition blocks.
       visitStatementList(condition.block.statementList)
       return
     }
