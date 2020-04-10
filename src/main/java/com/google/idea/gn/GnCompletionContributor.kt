@@ -3,11 +3,11 @@
 //  license that can be found in the LICENSE file.
 package com.google.idea.gn
 
-import com.google.idea.gn.psi.Builtin
-import com.google.idea.gn.psi.GnFile
+import com.google.idea.gn.psi.*
 import com.google.idea.gn.psi.Target
-import com.google.idea.gn.psi.Types
 import com.google.idea.gn.psi.builtin.Import
+import com.google.idea.gn.psi.scope.FileScope
+import com.google.idea.gn.psi.scope.Scope
 import com.intellij.codeInsight.completion.*
 import com.intellij.codeInsight.completion.impl.CamelHumpMatcher
 import com.intellij.codeInsight.lookup.LookupElementBuilder
@@ -20,8 +20,11 @@ import com.intellij.openapi.vfs.VfsUtilCore
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.VirtualFileVisitor
 import com.intellij.patterns.PlatformPatterns
+import com.intellij.patterns.PlatformPatterns.psiElement
+import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiManager
+import com.intellij.psi.util.parentOfType
 import com.intellij.util.ProcessingContext
 import com.intellij.util.text.Matcher
 import java.io.StringWriter
@@ -31,7 +34,7 @@ class GnCompletionContributor : CompletionContributor() {
 
   companion object {
     val LOGGER = Logger.getInstance(GnCompletionContributor::class.toString())
-    const val DUMMY_ID = "__gn_dummy__"
+    const val DUMMY_ID = "gn_dummy_completion_"
   }
 
 
@@ -116,7 +119,8 @@ class GnCompletionContributor : CompletionContributor() {
                 if (!state.foundNamedTarget) {
                   val path = getPath(file)
                   if (path.isNotEmpty()) {
-                    result.addElement(createElementBuilderWithIcon(getPath(file), CompleteType.DIRECTORY))
+                    result.addElement(
+                        createElementBuilderWithIcon(getPath(file), CompleteType.DIRECTORY))
                   }
                 }
                 if (!stack.empty()) {
@@ -181,7 +185,8 @@ class GnCompletionContributor : CompletionContributor() {
                   }
                 }
               } else {
-                result.addElement(createElementBuilderWithIcon(basePath, CompleteType.FILE, manager.findFile(file)))
+                result.addElement(createElementBuilderWithIcon(basePath, CompleteType.FILE,
+                    manager.findFile(file)))
               }
               return false
             }
@@ -201,27 +206,68 @@ class GnCompletionContributor : CompletionContributor() {
   init {
     // Complete DEPS and PUBLIC_DEPS.
     extend(CompletionType.BASIC,
-        PlatformPatterns.psiElement(Types.STRING_LITERAL)
+        psiElement(Types.STRING_LITERAL)
             .withAncestor(10,
-                PlatformPatterns.psiElement(Types.ASSIGNMENT).withFirstNonWhitespaceChild(
-                    PlatformPatterns.psiElement(Types.LVALUE)
+                psiElement(Types.ASSIGNMENT).withFirstNonWhitespaceChild(
+                    psiElement(Types.LVALUE)
                         .withText(
-                            PlatformPatterns.string().oneOf(Builtin.DEPS, Builtin.PUBLIC_DEPS))
+                            PlatformPatterns.string()
+                                .oneOf(Builtin.DEPS.name, Builtin.PUBLIC_DEPS.name))
                 )
-            ), FileCompletionProvider(Matcher { name: String -> name == GnFile.BUILD_FILE }, skipFileName = true, parseTargets = true)
+            ), FileCompletionProvider(Matcher { name: String -> name == GnFile.BUILD_FILE },
+        skipFileName = true, parseTargets = true)
     )
 
     // Complete imports.
-    extend(CompletionType.BASIC, PlatformPatterns.psiElement(Types.STRING_LITERAL)
-        .withSuperParent(2, PlatformPatterns.psiElement(Types.CALL)
-            .withFirstNonWhitespaceChild(PlatformPatterns.psiElement(Types.ID).withText(
-                Import.NAME))), FileCompletionProvider(Matcher { name: String -> name.endsWith(GnFile.GNI) }))
+    extend(CompletionType.BASIC, psiElement(Types.STRING_LITERAL)
+        .withSuperParent(5, psiElement(Types.CALL)
+            .withFirstNonWhitespaceChild(psiElement(Types.ID).withText(
+                Import.NAME))),
+        FileCompletionProvider(Matcher { name: String -> name.endsWith(GnFile.GNI) }))
 
     // Complete sources.
-    extend(CompletionType.BASIC, PlatformPatterns.psiElement(Types.STRING_LITERAL).withAncestor(10,
-        PlatformPatterns.psiElement(Types.ASSIGNMENT)
-            .withFirstChild(PlatformPatterns.psiElement(Types.LVALUE).withText(Builtin.SOURCES))),
+    extend(CompletionType.BASIC, psiElement(Types.STRING_LITERAL).withAncestor(10,
+        psiElement(Types.ASSIGNMENT)
+            .withFirstChild(
+                psiElement(Types.LVALUE).withText(Builtin.SOURCES.name))),
         FileCompletionProvider(Matcher { true }))
+
+    extend(CompletionType.BASIC, psiElement(Types.IDENTIFIER),
+        object : CompletionProvider<CompletionParameters>() {
+          override fun addCompletions(parameters: CompletionParameters, context: ProcessingContext, result: CompletionResultSet) {
+
+            val file = parameters.originalFile
+            if (file !is GnFile) {
+              return
+            }
+
+            val stopAt = parameters.originalPosition?.parentOfType(GnStatement::class,
+                GnBlock::class, GnFile::class) ?: file
+            val capturingVisitor = object : Visitor.ScopeInterceptor() {
+              var finalScope: Scope? = null
+              override fun afterVisit(element: PsiElement, scope: Scope): Boolean {
+                if (element == stopAt) {
+                  finalScope = scope
+                  return true
+                }
+                return false
+              }
+            }
+            val inFunction = stopAt.getUserData(GnKeys.CALL_RESOLVED_FUNCTION)
+            file.accept(Visitor(FileScope(), capturingVisitor))
+            val scope = capturingVisitor.finalScope ?: file.scope
+            scope.gatherCompletionIdentifiers {
+              ProgressManager.checkCanceled()
+              if (it == inFunction) {
+                it.gatherChildren { child ->
+                  child.addToResult(result)
+                }
+              }
+              it.addToResult(result)
+            }
+          }
+
+        })
   }
 
 

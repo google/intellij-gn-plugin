@@ -20,6 +20,11 @@ abstract class TargetFunction : Function() {
     targetScope.addTarget(Target(targetName, callSite))
   }
 
+  override val insertionText: String
+    get() = "$name(\"\")"
+  override val caretShift: Int
+    get() = -2
+
   override val isBuiltin: Boolean
     get() = true
 }

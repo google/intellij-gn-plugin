@@ -20,6 +20,7 @@ import static com.intellij.psi.TokenType.WHITE_SPACE;
 %function advance
 %type IElementType
 
+
 WHITE_SPACE=\s+
 
 // Reserved words

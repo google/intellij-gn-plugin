@@ -4,6 +4,7 @@
 package com.google.idea.gn.psi.scope
 
 import com.google.idea.gn.psi.Builtin
+import com.google.idea.gn.psi.CompletionIdentifier
 import com.google.idea.gn.psi.Function
 
 object BuiltinScope : Scope(null) {
@@ -12,4 +13,7 @@ object BuiltinScope : Scope(null) {
   }
 
   override fun installFunction(function: Function) = Unit // Can't install functions on BuiltinScope
+
+  override val functions: Sequence<Function>
+    get() = Builtin.FUNCTIONS.asSequence().map{ it.value }
 }

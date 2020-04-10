@@ -20,6 +20,7 @@
   extends(".*expr")=expr
   tokens = [
     comment="regexp:#.*"
+    newline="regexp:\n"
   ]
 }
 
@@ -56,7 +57,10 @@
  */
 
 file ::= statement-list
-statement ::= call | condition | assignment
+private statement-recover ::= !(newline | CBRACKET | CPAREN | CBRACE)
+statement ::= call | condition | assignment {
+  pin(".*")=1
+}
 lvalue ::= array-access | scope-access | id
 assignment ::= lvalue assign-op expr
 call ::= id OPAREN expr-list CPAREN [block]
@@ -64,12 +68,16 @@ call ::= id OPAREN expr-list CPAREN [block]
 condition ::= IF OPAREN expr CPAREN block [else-condition]
 else-condition ::= ELSE ( condition | block )
 block ::= OBRACE statement-list CBRACE
-statement-list ::= ( statement )*
+statement-list ::= ( statement )* {
+  recoverWhile="statement-recover"
+}
 array-access ::= id OBRACKET expr CBRACKET
 scope-access ::= id DOT id
 
 
-expr ::= and_expr | or_expr | equality-group | compare-group | add-group |  unary_expr | primary_expr | literal_expr
+expr ::= and_expr | or_expr | equality-group | compare-group | add-group |  unary_expr | primary_expr | literal_expr {
+  recoverWhile="statement-recover"
+}
 
 private add-group ::= plus_expr | minus_expr
 private compare-group ::= lt_expr | le_expr | gt_expr | ge_expr

@@ -49,8 +49,8 @@ class GnValue {
     get() = tryCast<List<GnValue>>()
 
 
-  fun and(other: GnValue): GnValue? = bool?.let { l -> other.bool?.let{ r -> GnValue(r && l) } }
-  fun or(other: GnValue): GnValue? = bool?.let { l -> other.bool?.let{ r -> GnValue(r || l) } }
+  fun and(other: GnValue): GnValue? = bool?.let { l -> other.bool?.let { r -> GnValue(r && l) } }
+  fun or(other: GnValue): GnValue? = bool?.let { l -> other.bool?.let { r -> GnValue(r || l) } }
   fun greaterThan(other: GnValue): GnValue? = int?.let { l -> other.int?.let { r -> GnValue(l > r) } }
   fun greaterThanOrEqual(other: GnValue): GnValue? = int?.let { l -> other.int?.let { r -> GnValue(l >= r) } }
   fun lessThan(other: GnValue): GnValue? = int?.let { l -> other.int?.let { r -> GnValue(l < r) } }
@@ -99,4 +99,28 @@ class GnValue {
   }
 
   override fun toString(): String = "GnValue($value)"
+  override fun hashCode(): Int {
+    return value.hashCode()
+  }
+
+  val type: Type
+    get() {
+      when (value) {
+        is String -> return Type.STRING
+        is Boolean -> return Type.BOOL
+        is Int -> return Type.INT
+      }
+      list?.let { return Type.LIST }
+      // If none of the other types, must be SCOPE.
+      scope!!
+      return Type.SCOPE
+    }
+
+  enum class Type {
+    BOOL,
+    STRING,
+    INT,
+    SCOPE,
+    LIST
+  }
 }

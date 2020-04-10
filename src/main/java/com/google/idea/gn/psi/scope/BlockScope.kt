@@ -3,21 +3,25 @@
 //  license that can be found in the LICENSE file.
 package com.google.idea.gn.psi.scope
 
+import com.google.idea.gn.psi.CompletionIdentifier
 import com.google.idea.gn.psi.Function
 import com.google.idea.gn.psi.GnValue
 
 open class BlockScope(parent: Scope?) : Scope(parent) {
   override fun getFunction(name: String): Function? {
-    return functions[name] ?: super.getFunction(name)
+    return installedFunctions[name] ?: super.getFunction(name)
   }
 
   override fun installFunction(function: Function) {
-    functions[function.name] = function
+    installedFunctions[function.name] = function
   }
 
   fun intoValue(): GnValue? {
     return consolidateVariables()?.let { GnValue(it) }
   }
 
-  private val functions: MutableMap<String, Function> = HashMap()
+  override val functions: Sequence<Function>
+    get() = installedFunctions.asSequence().map { it.value }
+
+  private val installedFunctions: MutableMap<String, Function> = HashMap()
 }

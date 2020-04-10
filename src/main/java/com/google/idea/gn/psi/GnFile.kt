@@ -10,7 +10,6 @@ import com.google.idea.gn.psi.scope.Scope
 import com.intellij.extapi.psi.PsiFileBase
 import com.intellij.openapi.fileTypes.FileType
 import com.intellij.openapi.util.Key
-import com.intellij.openapi.util.ModificationTracker
 import com.intellij.psi.FileViewProvider
 import com.intellij.psi.util.CachedValue
 import com.intellij.psi.util.CachedValueProvider
@@ -31,7 +30,7 @@ class GnFile(viewProvider: FileViewProvider) : PsiFileBase(viewProvider, GnLangu
   val scope: Scope
     get() = CachedValuesManager.getCachedValue(this, CACHE_KEY) {
       val fileScope = buildScope()
-      CachedValueProvider.Result(fileScope, ModificationTracker.NEVER_CHANGED)
+      CachedValueProvider.Result(fileScope, this)
     }
 
   fun buildScope(injected: Map<String, GnValue>? = null): Scope {

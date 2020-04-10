@@ -7,10 +7,14 @@ import com.google.idea.gn.psi.builtin.*
 import com.intellij.psi.PsiElement
 
 object Builtin {
-  const val DEPS = "deps"
-  const val PUBLIC_DEPS = "public_deps"
-  const val SOURCES = "sources"
-  val FUNCTIONS: Map<String, Function?> by lazy {
+
+  val DEPS by lazy { FunctionVariable("deps", GnValue.Type.LIST) }
+  val PUBLIC_DEPS by lazy { FunctionVariable("public_deps", GnValue.Type.LIST) }
+  val DATA_DEPS by lazy { FunctionVariable("data_deps", GnValue.Type.LIST) }
+
+  val SOURCES by lazy { FunctionVariable("sources", GnValue.Type.LIST)}
+
+  val FUNCTIONS: Map<String, Function> by lazy {
     arrayOf(Group(), SourceSet(), Executable(), Import(),
         Template()).associateBy { it.name }
   }

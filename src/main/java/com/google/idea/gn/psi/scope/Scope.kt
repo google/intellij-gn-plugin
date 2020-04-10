@@ -15,6 +15,8 @@ abstract class Scope protected constructor(val parent: Scope?) {
 
   abstract fun installFunction(function: Function)
 
+  abstract val functions: Sequence<Function>
+
   open val targets: Map<String, Target>?
     get() = parent?.targets
 
@@ -52,6 +54,22 @@ abstract class Scope protected constructor(val parent: Scope?) {
     return map
   }
 
+  fun gatherCompletionIdentifiers(operator: (CompletionIdentifier) -> Unit) {
+    variables?.forEach {
+      operator(it.value)
+    }
+    functions.forEach {
+      operator(it)
+    }
+    parent?.gatherCompletionIdentifiers(operator)
+  }
+
+  override fun toString(): String {
+    return "$parent{Scope(variables: ${variables?.values?.joinToString { it.name }}, functions:${functions.joinToString { it.name }})}"
+  }
+
   private var _variables: MutableMap<String, Variable>? = null
+
+
 
 }

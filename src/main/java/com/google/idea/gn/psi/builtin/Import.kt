@@ -28,6 +28,14 @@ class Import : Function() {
   override val name: String
     get() = NAME
 
+
+  override val insertionText: String
+    get() = "$name(\"\")"
+  override val caretShift: Int
+    get() = -2
+  override val autoSuggestOnInsertion: Boolean
+    get() = true
+
   companion object {
     const val NAME = "import"
   }
