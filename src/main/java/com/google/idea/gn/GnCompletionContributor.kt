@@ -258,6 +258,13 @@ class GnCompletionContributor : CompletionContributor() {
             val scope = capturingVisitor.finalScope ?: file.scope
             scope.gatherCompletionIdentifiers {
               ProgressManager.checkCanceled()
+
+              // Don't suggest target functions within a target function.
+              if (inFunction?.identifierType == CompletionIdentifier.IdentifierType.TARGET_FUNCTION
+                  && it.identifierType == CompletionIdentifier.IdentifierType.TARGET_FUNCTION) {
+                return@gatherCompletionIdentifiers
+              }
+
               if (it == inFunction) {
                 it.gatherChildren { child ->
                   child.addToResult(result)

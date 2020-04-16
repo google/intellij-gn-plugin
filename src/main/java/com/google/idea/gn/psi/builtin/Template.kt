@@ -3,10 +3,8 @@
 //  license that can be found in the LICENSE file.
 package com.google.idea.gn.psi.builtin
 
+import com.google.idea.gn.psi.*
 import com.google.idea.gn.psi.Function
-import com.google.idea.gn.psi.GnCall
-import com.google.idea.gn.psi.GnPsiUtil
-import com.google.idea.gn.psi.TemplateFunction
 import com.google.idea.gn.psi.scope.Scope
 
 class Template : Function() {
@@ -15,6 +13,9 @@ class Template : Function() {
     val name = GnPsiUtil.evaluateFirstToString(call.exprList, targetScope) ?: return
     targetScope.installFunction(TemplateFunction(name, block))
   }
+
+  override val identifierType: CompletionIdentifier.IdentifierType
+    get() = CompletionIdentifier.IdentifierType.FUNCTION
 
   override val isBuiltin: Boolean
     get() = true

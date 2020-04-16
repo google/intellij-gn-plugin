@@ -8,6 +8,11 @@ class Variable(override val name: String) : CompletionIdentifier {
     this.value = value
   }
 
+  override val identifierType: CompletionIdentifier.IdentifierType
+    get() = CompletionIdentifier.IdentifierType.VARIABLE
+
+  override val typeString: String?
+    get() = value?.type?.toString()
   var value: GnValue? = null
 
 }

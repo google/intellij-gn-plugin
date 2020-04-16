@@ -121,6 +121,15 @@ class GnValue {
     STRING,
     INT,
     SCOPE,
-    LIST
+    LIST;
+
+    override fun toString(): String =
+      when(this) {
+        BOOL -> "Boolean"
+        STRING -> "String"
+        INT -> "Integer"
+        SCOPE -> "Scope"
+        LIST -> "List"
+      }
   }
 }

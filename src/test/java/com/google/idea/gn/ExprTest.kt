@@ -94,6 +94,13 @@ class ExprTest : GnCodeInsightTestCase() {
     assertEquals("abc9Z", result.value)
   }
 
+  fun testEmptyScope() {
+    val result = executeAndGetTestVar("""
+      $TEST_VAR = {}
+    """)
+    assertEquals(GnValue(emptyMap()), result)
+  }
+
   fun testScopeAccess() {
     val result = executeAndGetTestVar("""
       $TEST_VAR = my_scope.my_inner_var

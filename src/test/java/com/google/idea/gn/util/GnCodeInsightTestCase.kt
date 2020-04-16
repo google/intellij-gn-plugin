@@ -8,6 +8,7 @@ import com.intellij.openapi.application.runWriteAction
 import com.intellij.openapi.project.guessProjectDir
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.openapi.vfs.VirtualFileVisitor
 import com.intellij.testFramework.LightPlatformCodeInsightTestCase
 
 abstract class GnCodeInsightTestCase : LightPlatformCodeInsightTestCase() {
@@ -15,12 +16,26 @@ abstract class GnCodeInsightTestCase : LightPlatformCodeInsightTestCase() {
 
   fun copyTestFiles(filter: (VirtualFile) -> Boolean) {
     runWriteAction {
-      VfsUtil.copyDirectory(this, getVirtualFile(""), project.guessProjectDir()!!, filter)
+      val projDir = project.guessProjectDir()!!
+      VfsUtil.copyDirectory(this, getVirtualFile(""), projDir, filter)
+      // Delete any empty directories.
+      VfsUtil.visitChildrenRecursively(projDir, object: VirtualFileVisitor<Unit>() {
+        override fun visitFile(file: VirtualFile): Boolean {
+          return if(file.isDirectory && file.children.isEmpty()) {
+            file.delete(this)
+            false
+          } else {
+            true
+          }
+        }
+      })
     }
   }
 
   fun copyTestFilesByPath(filter: (String) -> Boolean) {
-    copyTestFiles { filter(VfsUtil.getRelativePath(it, getVirtualFile(""))!!) }
+    copyTestFiles{
+      it.isDirectory || filter(VfsUtil.getRelativePath(it, getVirtualFile(""))!!)
+    }
   }
 
 }

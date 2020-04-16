@@ -7,6 +7,9 @@ package com.google.idea.gn.psi
 import com.intellij.codeInsight.AutoPopupController
 import com.intellij.codeInsight.completion.CompletionResultSet
 import com.intellij.codeInsight.lookup.LookupElementBuilder
+import com.intellij.icons.AllIcons
+import com.intellij.ui.LayeredIcon
+import javax.swing.Icon
 
 interface CompletionIdentifier {
   val name: String
@@ -14,17 +17,36 @@ interface CompletionIdentifier {
   val caretShift: Int get() = 0
   val autoSuggestOnInsertion: Boolean get() = false
 
-  fun gatherChildren(operator: (CompletionIdentifier) -> Unit) = Unit
+  enum class IdentifierType {
+    FUNCTION,
+    TARGET_FUNCTION,
+    VARIABLE,
+    TEMPLATE;
 
-  val isCall: Boolean get() = false
+    val icon: Icon
+      get() = when (this) {
+        FUNCTION -> AllIcons.Nodes.Function
+        TARGET_FUNCTION -> LayeredIcon.create(AllIcons.Nodes.Target, AllIcons.Nodes.Shared)
+        VARIABLE -> AllIcons.Nodes.Variable
+        TEMPLATE -> AllIcons.Actions.Lightning
+      }
+  }
+
+  val identifierType: IdentifierType
+
+  val typeString: String? get() = null
+
+  fun gatherChildren(operator: (CompletionIdentifier) -> Unit) = Unit
 
   fun addToResult(resultSet: CompletionResultSet) {
 
     val element = LookupElementBuilder.create(insertionText)
         .withPresentableText(name)
+        .withIcon(identifierType.icon)
+        .withTypeText(typeString)
         .withInsertHandler { ctx, it ->
           ctx.editor.caretModel.primaryCaret.moveCaretRelatively(caretShift, 0, false, false)
-          if(autoSuggestOnInsertion) {
+          if (autoSuggestOnInsertion) {
             AutoPopupController.getInstance(ctx.project).scheduleAutoPopup(ctx.editor)
           }
         }

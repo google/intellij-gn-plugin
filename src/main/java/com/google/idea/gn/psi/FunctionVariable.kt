@@ -5,4 +5,7 @@
 package com.google.idea.gn.psi
 
 class FunctionVariable(override val name: String, val type: GnValue.Type) : CompletionIdentifier {
+
+  override val identifierType: CompletionIdentifier.IdentifierType
+    get() = CompletionIdentifier.IdentifierType.VARIABLE
 }

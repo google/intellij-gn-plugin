@@ -28,6 +28,9 @@ class TemplateFunction(override val name: String, private val block: GnBlock) : 
     Visitor(BlockScope(executionScope)).visitBlock(this.block)
   }
 
+  override val identifierType: CompletionIdentifier.IdentifierType
+    get() = CompletionIdentifier.IdentifierType.TEMPLATE
+
   override val isBuiltin: Boolean
     get() = false
 

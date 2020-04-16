@@ -5,10 +5,8 @@ package com.google.idea.gn.psi.builtin
 
 import com.google.idea.gn.GnLabel
 import com.google.idea.gn.GnLanguage
+import com.google.idea.gn.psi.*
 import com.google.idea.gn.psi.Function
-import com.google.idea.gn.psi.GnCall
-import com.google.idea.gn.psi.GnPsiUtil
-import com.google.idea.gn.psi.Visitor
 import com.google.idea.gn.psi.scope.Scope
 
 class Import : Function() {
@@ -22,17 +20,15 @@ class Import : Function() {
     file.accept(Visitor(targetScope))
   }
 
+  override val identifierType: CompletionIdentifier.IdentifierType
+    get() = CompletionIdentifier.IdentifierType.FUNCTION
+
   override val isBuiltin: Boolean
     get() = true
 
   override val name: String
     get() = NAME
 
-
-  override val insertionText: String
-    get() = "$name(\"\")"
-  override val caretShift: Int
-    get() = -2
   override val autoSuggestOnInsertion: Boolean
     get() = true
 
