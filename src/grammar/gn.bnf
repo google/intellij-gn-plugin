@@ -65,8 +65,12 @@ lvalue ::= array-access | scope-access | id
 assignment ::= lvalue assign-op expr
 call ::= id OPAREN expr-list CPAREN [block]
 
-condition ::= IF OPAREN expr CPAREN block [else-condition]
-else-condition ::= ELSE ( condition | block )
+condition ::= IF OPAREN expr CPAREN block [else-condition] {
+   pin(".*")=1
+}
+else-condition ::= ELSE ( condition | block ) {
+  pin(".*")=1
+}
 block ::= OBRACE statement-list CBRACE
 statement-list ::= ( statement )* {
   recoverWhile="statement-recover"

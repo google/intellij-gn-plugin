@@ -105,9 +105,9 @@ class Visitor(scope: Scope, private val interceptor: VisitorDelegate = object : 
     if (stop) {
       return
     }
-    val result: GnValue? = GnPsiUtil.evaluate(condition.expr, scope)
+    val result: GnValue? = GnPsiUtil.evaluate(condition.expr ?: return, scope)
     if (result?.bool == true) { // Visit statement list directly, there's no scope created by condition blocks.
-      visitStatementList(condition.block.statementList)
+      condition.block?.statementList?.let { visitStatementList(it) }
       return
     }
     val elseCondition = condition.elseCondition ?: return

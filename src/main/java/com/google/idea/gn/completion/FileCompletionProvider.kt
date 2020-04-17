@@ -109,7 +109,7 @@ class FileCompletionProvider @JvmOverloads constructor(private val mFileMatcher:
                 if (path.isNotEmpty() && path != "//") {
                   result.addElement(
                       createElementBuilderWithIcon(path,
-                          GnCompletionContributor.CompleteType.DIRECTORY))
+                          CompleteType.DIRECTORY))
                 }
               }
               if (!stack.empty()) {
@@ -118,14 +118,14 @@ class FileCompletionProvider @JvmOverloads constructor(private val mFileMatcher:
             }
           }
 
-          private fun createElementBuilderWithIcon(lookup: String, type: GnCompletionContributor.CompleteType, file: PsiFile? = null): LookupElementBuilder {
+          private fun createElementBuilderWithIcon(lookup: String, type: CompleteType, file: PsiFile? = null): LookupElementBuilder {
             val elementBuilder = LookupElementBuilder.create(
                 lookup)
-            elementBuilder.putUserData(GnKeys.LOOKUP_ITEM_TYPE, type)
+            elementBuilder.putUserData(GnKeys.LABEL_COMPLETION_TYPE, type)
             val icon = when (type) {
-              GnCompletionContributor.CompleteType.TARGET -> AllIcons.Nodes.Target
-              GnCompletionContributor.CompleteType.DIRECTORY -> AllIcons.Nodes.Folder
-              GnCompletionContributor.CompleteType.FILE -> file?.getIcon(
+              CompleteType.TARGET -> AllIcons.Nodes.Target
+              CompleteType.DIRECTORY -> AllIcons.Nodes.Folder
+              CompleteType.FILE -> file?.getIcon(
                   0)
             } ?: return elementBuilder
             return elementBuilder.withIcon(icon)
@@ -174,12 +174,12 @@ class FileCompletionProvider @JvmOverloads constructor(private val mFileMatcher:
                 if (suggestion.isNotEmpty()) {
                   result
                       .addElement(createElementBuilderWithIcon(suggestion,
-                          GnCompletionContributor.CompleteType.TARGET))
+                          CompleteType.TARGET))
                 }
               }
             } else {
               result.addElement(createElementBuilderWithIcon(basePath,
-                  GnCompletionContributor.CompleteType.FILE,
+                  CompleteType.FILE,
                   manager.findFile(file)))
             }
             return false
@@ -194,5 +194,7 @@ class FileCompletionProvider @JvmOverloads constructor(private val mFileMatcher:
     var foundBuildFile = false
     var foundNamedTarget = false
   }
+
+  enum class CompleteType { TARGET, DIRECTORY, FILE }
 
 }

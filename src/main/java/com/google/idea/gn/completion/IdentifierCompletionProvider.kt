@@ -6,6 +6,7 @@ package com.google.idea.gn.completion
 
 import com.google.idea.gn.GnKeys
 import com.google.idea.gn.psi.*
+import com.google.idea.gn.psi.builtin.Template
 import com.google.idea.gn.psi.scope.FileScope
 import com.google.idea.gn.psi.scope.Scope
 import com.intellij.codeInsight.completion.CompletionParameters
@@ -21,27 +22,31 @@ class IdentifierCompletionProvider : CompletionProvider<CompletionParameters>() 
   override fun addCompletions(parameters: CompletionParameters, context: ProcessingContext, _result: CompletionResultSet) {
     val result = IdentifierCompletionResultSet(_result)
 
-    val file = parameters.originalFile
+    val position = parameters.position
+    val file = position.containingFile
     if (file !is GnFile) {
       return
     }
 
-    val originalPosition = parameters.originalPosition
-
-    val stopAt = originalPosition?.parentOfType(GnStatement::class,
+    val stopAt = position.parentOfType(GnStatement::class,
         GnBlock::class, GnFile::class) ?: file
 
-    val inFunction = originalPosition?.parentOfType(GnCall::class)
-        ?.getUserData(GnKeys.CALL_RESOLVED_FUNCTION)
 
     val capturingVisitor = object : Visitor.VisitorDelegate() {
       var finalScope: Scope? = null
 
       override fun resolveCall(call: GnCall): Visitor.CallAction =
-          if (originalPosition?.parents()?.contains(call) == true) {
-            Visitor.CallAction.VISIT_BLOCK
-          } else {
-            Visitor.CallAction.SKIP
+          when {
+            call.getUserData(GnKeys.CALL_RESOLVED_FUNCTION) is Template -> {
+              // Template calls must be executed so they show up in the scope.
+              Visitor.CallAction.EXECUTE
+            }
+            position.parents().contains(call) -> {
+              Visitor.CallAction.VISIT_BLOCK
+            }
+            else -> {
+              Visitor.CallAction.SKIP
+            }
           }
 
 
@@ -54,7 +59,11 @@ class IdentifierCompletionProvider : CompletionProvider<CompletionParameters>() 
       }
     }
     file.accept(Visitor(FileScope(), capturingVisitor))
+
     val scope = capturingVisitor.finalScope ?: file.scope
+
+    val inFunction = position.parentOfType(GnCall::class)
+        ?.getUserData(GnKeys.CALL_RESOLVED_FUNCTION)
 
 
     scope.gatherCompletionIdentifiers {

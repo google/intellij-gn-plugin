@@ -26,6 +26,9 @@ class Template : Function() {
   override val name: String
     get() = NAME
 
+  override val postInsertType: CompletionIdentifier.PostInsertType?
+    get() = CompletionIdentifier.PostInsertType.CALL_WITH_STRING
+
   companion object {
     const val NAME = "template"
     const val TARGET_NAME = "target_name"

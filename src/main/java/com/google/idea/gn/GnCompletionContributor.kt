@@ -30,8 +30,6 @@ class GnCompletionContributor : CompletionContributor() {
     context.replacementOffset = 0
   }
 
-  enum class CompleteType { TARGET, DIRECTORY, FILE }
-
   init {
     // Complete DEPS and PUBLIC_DEPS.
     extend(CompletionType.BASIC,

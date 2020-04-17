@@ -4,11 +4,15 @@
 
 package com.google.idea.gn
 
+import com.google.idea.gn.completion.CompletionIdentifier
+import com.google.idea.gn.completion.FileCompletionProvider
 import com.google.idea.gn.psi.Function
 import com.intellij.openapi.util.Key
 
 object GnKeys {
-  val LOOKUP_ITEM_TYPE: Key<GnCompletionContributor.CompleteType> = Key(
-      "com.google.idea.gn.LOOKUP_ITEM_TYPE")
+  val LABEL_COMPLETION_TYPE: Key<FileCompletionProvider.CompleteType> = Key(
+      "com.google.idea.gn.LABEL_COMPLETION_TYPE")
+  val IDENTIFIER_COMPLETION_TYPE: Key<CompletionIdentifier.IdentifierType> = Key(
+      "com.google.idea.gn.IDENTIFIER_COMPLETION_TYPE")
   val CALL_RESOLVED_FUNCTION: Key<Function> = Key("com.google.idea.gn.CALL_RESOLVED_FUNCTION")
 }

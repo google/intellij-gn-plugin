@@ -4,6 +4,7 @@
 
 package com.google.idea.gn.completion
 
+import com.google.idea.gn.GnKeys
 import com.intellij.codeInsight.AutoPopupController
 import com.intellij.codeInsight.completion.CompletionResultSet
 import com.intellij.codeInsight.lookup.LookupElementBuilder
@@ -13,9 +14,14 @@ import javax.swing.Icon
 
 interface CompletionIdentifier {
   val name: String
-  val insertionText: String get() = name
-  val caretShift: Int get() = 0
   val autoSuggestOnInsertion: Boolean get() = false
+  val postInsertType: PostInsertType? get() = null
+
+
+  enum class PostInsertType(val extra: String, val caretShift: Int) {
+    CALL("()", 1),
+    CALL_WITH_STRING("(\"\")", 2);
+  }
 
   enum class IdentifierType {
     FUNCTION,
@@ -42,17 +48,19 @@ interface CompletionIdentifier {
 
   fun addToResult(resultSet: CompletionResultSet) {
     resultSet.startBatch()
-    val element = LookupElementBuilder.create(insertionText)
-        .withPresentableText(name)
+    val element = LookupElementBuilder.create(name)
         .withIcon(identifierType.icon)
         .withTypeText(typeString)
         .withInsertHandler { ctx, it ->
-          ctx.editor.caretModel.primaryCaret.moveCaretRelatively(caretShift, 0, false, false)
+          postInsertType?.let {
+            ctx.document.insertString(ctx.tailOffset, it.extra)
+            ctx.editor.caretModel.primaryCaret.moveCaretRelatively(it.caretShift, 0, false, false)
+          }
           if (autoSuggestOnInsertion) {
             AutoPopupController.getInstance(ctx.project).scheduleAutoPopup(ctx.editor)
           }
         }
-
+    element.putUserData(GnKeys.IDENTIFIER_COMPLETION_TYPE, identifierType)
     resultSet.addElement(element)
   }
 }

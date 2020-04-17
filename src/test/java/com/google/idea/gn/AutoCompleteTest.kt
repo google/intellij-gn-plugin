@@ -4,13 +4,19 @@
 
 package com.google.idea.gn
 
+import com.google.idea.gn.completion.CompletionIdentifier
+import com.google.idea.gn.completion.FileCompletionProvider
+import com.google.idea.gn.psi.Builtin
 import com.google.idea.gn.psi.GnFile
+import com.google.idea.gn.psi.builtin.Group
+import com.google.idea.gn.psi.builtin.TargetFunction
 import com.google.idea.gn.util.GnCodeInsightTestCase
-import com.intellij.codeInsight.completion.CodeCompletionHandlerBase
-import com.intellij.codeInsight.completion.CompletionType
+import com.intellij.codeInsight.completion.*
+import com.intellij.codeInsight.lookup.Lookup
 import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.codeInsight.lookup.LookupManager
-import com.intellij.testFramework.fixtures.impl.CodeInsightTestFixtureImpl
+import com.intellij.openapi.application.runWriteAction
+import com.intellij.openapi.util.Key
 
 class AutoCompleteTest : GnCodeInsightTestCase() {
 
@@ -19,9 +25,14 @@ class AutoCompleteTest : GnCodeInsightTestCase() {
     return LookupManager.getActiveLookup(editor)?.items ?: emptyList()
   }
 
-  private fun performCompletionAndGetItems(): List<Pair<String, GnCompletionContributor.CompleteType?>> = performCompletion().map {
-    Pair(it.lookupString, it.getUserData(GnKeys.LOOKUP_ITEM_TYPE))
-  }
+  private fun performLabelCompletion() = performCompletionAndGetItemsWithKey(
+      GnKeys.LABEL_COMPLETION_TYPE)
+
+  private fun performIdentifierCompletion() = performCompletionAndGetItemsWithKey(
+      GnKeys.IDENTIFIER_COMPLETION_TYPE)
+
+  private fun <T> performCompletionAndGetItemsWithKey(key: Key<T>): List<Pair<String, T?>> =
+      performCompletion().map { it.lookupString to it.getUserData(key) }
 
   fun testLabelCompletion() {
     copyTestFilesByPath {
@@ -34,15 +45,15 @@ class AutoCompleteTest : GnCodeInsightTestCase() {
       }
     }
     configureFromFileText(GnFile.BUILD_FILE, """group("g"){deps=["<caret>"]}""")
-    CodeInsightTestFixtureImpl.instantiateAndRun(file, editor, IntArray(0), false)
+
     assertEquals(listOf(
-        Pair(":g", GnCompletionContributor.CompleteType.TARGET),
-        Pair("src", GnCompletionContributor.CompleteType.DIRECTORY),
-        Pair("src/lib", GnCompletionContributor.CompleteType.DIRECTORY),
-        Pair("src/lib:my_lib", GnCompletionContributor.CompleteType.TARGET),
-        Pair("src/test", GnCompletionContributor.CompleteType.TARGET),
-        Pair("src:my_src", GnCompletionContributor.CompleteType.TARGET)),
-        performCompletionAndGetItems())
+        Pair(":g", FileCompletionProvider.CompleteType.TARGET),
+        Pair("src", FileCompletionProvider.CompleteType.DIRECTORY),
+        Pair("src/lib", FileCompletionProvider.CompleteType.DIRECTORY),
+        Pair("src/lib:my_lib", FileCompletionProvider.CompleteType.TARGET),
+        Pair("src/test", FileCompletionProvider.CompleteType.TARGET),
+        Pair("src:my_src", FileCompletionProvider.CompleteType.TARGET)),
+        performLabelCompletion())
   }
 
   fun testAbsoluteLabelCompletion() {
@@ -56,15 +67,15 @@ class AutoCompleteTest : GnCodeInsightTestCase() {
       }
     }
     configureFromFileText(GnFile.BUILD_FILE, """group("g"){deps=["//<caret>"]}""")
-    CodeInsightTestFixtureImpl.instantiateAndRun(file, editor, IntArray(0), false)
+
     assertEquals(listOf(
-        Pair("//:g", GnCompletionContributor.CompleteType.TARGET),
-        Pair("//src", GnCompletionContributor.CompleteType.DIRECTORY),
-        Pair("//src/lib", GnCompletionContributor.CompleteType.DIRECTORY),
-        Pair("//src/lib:my_lib", GnCompletionContributor.CompleteType.TARGET),
-        Pair("//src/test", GnCompletionContributor.CompleteType.TARGET),
-        Pair("//src:my_src", GnCompletionContributor.CompleteType.TARGET)),
-        performCompletionAndGetItems())
+        Pair("//:g", FileCompletionProvider.CompleteType.TARGET),
+        Pair("//src", FileCompletionProvider.CompleteType.DIRECTORY),
+        Pair("//src/lib", FileCompletionProvider.CompleteType.DIRECTORY),
+        Pair("//src/lib:my_lib", FileCompletionProvider.CompleteType.TARGET),
+        Pair("//src/test", FileCompletionProvider.CompleteType.TARGET),
+        Pair("//src:my_src", FileCompletionProvider.CompleteType.TARGET)),
+        performLabelCompletion())
   }
 
   fun testImportCompletion() {
@@ -75,12 +86,11 @@ class AutoCompleteTest : GnCodeInsightTestCase() {
       }
     }
     configureFromFileText(GnFile.BUILD_FILE, """import("<caret>")""")
-    CodeInsightTestFixtureImpl.instantiateAndRun(file, editor, IntArray(0), false)
 
     assertEquals(listOf(
-        Pair("build", GnCompletionContributor.CompleteType.DIRECTORY),
-        Pair("build/rules.gni", GnCompletionContributor.CompleteType.FILE)),
-        performCompletionAndGetItems())
+        Pair("build", FileCompletionProvider.CompleteType.DIRECTORY),
+        Pair("build/rules.gni", FileCompletionProvider.CompleteType.FILE)),
+        performLabelCompletion())
   }
 
   fun testAbsoluteImportCompletion() {
@@ -91,11 +101,60 @@ class AutoCompleteTest : GnCodeInsightTestCase() {
       }
     }
     configureFromFileText(GnFile.BUILD_FILE, """import("//<caret>")""")
-    CodeInsightTestFixtureImpl.instantiateAndRun(file, editor, IntArray(0), false)
 
     assertEquals(listOf(
-        Pair("//build", GnCompletionContributor.CompleteType.DIRECTORY),
-        Pair("//build/rules.gni", GnCompletionContributor.CompleteType.FILE)),
-        performCompletionAndGetItems())
+        Pair("//build", FileCompletionProvider.CompleteType.DIRECTORY),
+        Pair("//build/rules.gni", FileCompletionProvider.CompleteType.FILE)),
+        performLabelCompletion())
+  }
+
+  fun testIdentifierCompletionWithinTargetCall() {
+    configureFromFileText(GnFile.BUILD_FILE, """
+      global = "x"
+      group("g") {
+        local = "d"
+        <caret>
+      }
+    """.trimIndent())
+
+    val expect = setOf(
+        "global" to CompletionIdentifier.IdentifierType.VARIABLE,
+        "local" to CompletionIdentifier.IdentifierType.VARIABLE)
+        .plus(Builtin.FUNCTIONS.values.filter { it !is TargetFunction }
+            .map { it.name to it.identifierType })
+        .plus(Group.VARIABLES.values.map { it.name to it.identifierType })
+
+    assertEquals(expect,
+        performIdentifierCompletion().toSet())
+  }
+
+  fun testIdentifierCompletionFromFileRoot() {
+    configureFromFileText(GnFile.BUILD_FILE, """
+      global = "x"
+      
+      template("my_template") {
+      }
+      
+      <caret>
+    """.trimIndent())
+    val expect = setOf(
+        "global" to CompletionIdentifier.IdentifierType.VARIABLE,
+        "my_template" to CompletionIdentifier.IdentifierType.TEMPLATE)
+        .plus(Builtin.FUNCTIONS.values.map { it.name to it.identifierType })
+    assertEquals(expect, performIdentifierCompletion().toSet())
+  }
+
+  fun testIdentifierExtraInsertion() {
+    configureFromFileText(GnFile.BUILD_FILE, "templ<caret>")
+    val item = performCompletion()[0]
+    runWriteAction {
+      editor.document.replaceString(0, editor.caretModel.primaryCaret.offset, "")
+      CompletionUtil.emulateInsertion(item, editor.caretModel.primaryCaret.offset,
+          InsertionContext(OffsetMap(editor.document), Lookup.AUTO_INSERT_SELECT_CHAR,
+              arrayOf(item),
+              file, editor, false))
+    }
+    assertEquals("""template("")""", editor.document.text)
+    assertEquals("template(\"".length, editor.caretModel.primaryCaret.offset)
   }
 }

@@ -35,6 +35,9 @@ class Import : Function() {
   override val autoSuggestOnInsertion: Boolean
     get() = true
 
+  override val postInsertType: CompletionIdentifier.PostInsertType?
+    get() = CompletionIdentifier.PostInsertType.CALL_WITH_STRING
+
   companion object {
     const val NAME = "import"
   }

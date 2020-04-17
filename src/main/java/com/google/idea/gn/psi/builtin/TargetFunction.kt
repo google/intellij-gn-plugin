@@ -24,6 +24,9 @@ abstract class TargetFunction : Function() {
   override val identifierType: CompletionIdentifier.IdentifierType
     get() = CompletionIdentifier.IdentifierType.TARGET_FUNCTION
 
+  override val postInsertType: CompletionIdentifier.PostInsertType?
+    get() = CompletionIdentifier.PostInsertType.CALL_WITH_STRING
+
   override val isBuiltin: Boolean
     get() = true
 }
