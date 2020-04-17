@@ -71,5 +71,4 @@ abstract class Scope protected constructor(val parent: Scope?) {
   private var _variables: MutableMap<String, Variable>? = null
 
 
-
 }

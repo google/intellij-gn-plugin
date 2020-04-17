@@ -51,10 +51,24 @@ class GnValue {
 
   fun and(other: GnValue): GnValue? = bool?.let { l -> other.bool?.let { r -> GnValue(r && l) } }
   fun or(other: GnValue): GnValue? = bool?.let { l -> other.bool?.let { r -> GnValue(r || l) } }
-  fun greaterThan(other: GnValue): GnValue? = int?.let { l -> other.int?.let { r -> GnValue(l > r) } }
-  fun greaterThanOrEqual(other: GnValue): GnValue? = int?.let { l -> other.int?.let { r -> GnValue(l >= r) } }
+  fun greaterThan(other: GnValue): GnValue? = int?.let { l ->
+    other.int?.let { r ->
+      GnValue(l > r)
+    }
+  }
+
+  fun greaterThanOrEqual(other: GnValue): GnValue? = int?.let { l ->
+    other.int?.let { r ->
+      GnValue(l >= r)
+    }
+  }
+
   fun lessThan(other: GnValue): GnValue? = int?.let { l -> other.int?.let { r -> GnValue(l < r) } }
-  fun lessThanOrEqual(other: GnValue): GnValue? = int?.let { l -> other.int?.let { r -> GnValue(l <= r) } }
+  fun lessThanOrEqual(other: GnValue): GnValue? = int?.let { l ->
+    other.int?.let { r ->
+      GnValue(l <= r)
+    }
+  }
 
   fun plus(other: GnValue): GnValue? {
     string?.let { l -> return other.string?.let { r -> GnValue(l + r) } }
@@ -124,12 +138,12 @@ class GnValue {
     LIST;
 
     override fun toString(): String =
-      when(this) {
-        BOOL -> "Boolean"
-        STRING -> "String"
-        INT -> "Integer"
-        SCOPE -> "Scope"
-        LIST -> "List"
-      }
+        when (this) {
+          BOOL -> "Boolean"
+          STRING -> "String"
+          INT -> "Integer"
+          SCOPE -> "Scope"
+          LIST -> "List"
+        }
   }
 }

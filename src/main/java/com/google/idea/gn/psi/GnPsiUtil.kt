@@ -97,7 +97,8 @@ object GnPsiUtil {
       return scope.getVariable(ident.id.text)?.value?.string
     }
     inner.stringHex?.let { hex ->
-      return hex.node.findChildByType(Types.HEX_BYTE)?.text?.substring(2)?.toInt(16)?.toChar()?.toString()
+      return hex.node.findChildByType(Types.HEX_BYTE)?.text?.substring(2)?.toInt(16)?.toChar()
+          ?.toString()
     }
     inner.stringExpand?.let { expand ->
       return evaluateStringExpand(expand, scope)

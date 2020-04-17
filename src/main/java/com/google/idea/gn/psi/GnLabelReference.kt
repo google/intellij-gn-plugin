@@ -8,7 +8,8 @@ import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiReferenceBase
 
-class GnLabelReference(element: PsiElement, private val label: GnLabel) : PsiReferenceBase<PsiElement?>(element, TextRange(1, element.textRange.length - 1)) {
+class GnLabelReference(element: PsiElement, private val label: GnLabel) : PsiReferenceBase<PsiElement?>(
+    element, TextRange(1, element.textRange.length - 1)) {
   override fun resolve(): PsiElement? {
     val file = GnPsiUtil.findPsiFile(element.containingFile, label)
     val labelTarget = label.target

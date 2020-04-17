@@ -27,7 +27,8 @@ class GnFormattingBuilder : FormattingModelBuilder {
 
   companion object {
     private fun createSpaceBuilder(settings: CodeStyleSettings): SpacingBuilder {
-      return SpacingBuilder(settings, GnLanguage) // .around(Types.ASSIGN_OP).spacing(1, 1, 0, false, 0)
+      return SpacingBuilder(settings,
+          GnLanguage) // .around(Types.ASSIGN_OP).spacing(1, 1, 0, false, 0)
 // .between(Types.CPAREN, Types.BLOCK).spacing(1, 1, 0, false, 0)
 // .between(Types.STATEMENT, Types.STATEMENT).spacing(0, 0, 1, false, 1)
 // .afterInside(Types.COMMA, Types.COLLECTION).spacing(0, 0, 1, false, 0)

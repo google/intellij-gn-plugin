@@ -3,7 +3,6 @@
 //  license that can be found in the LICENSE file.
 package com.google.idea.gn.psi.scope
 
-import com.google.idea.gn.psi.CompletionIdentifier
 import com.google.idea.gn.psi.Function
 import com.google.idea.gn.psi.GnValue
 

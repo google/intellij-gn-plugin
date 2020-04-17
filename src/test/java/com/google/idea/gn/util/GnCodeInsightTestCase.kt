@@ -19,9 +19,9 @@ abstract class GnCodeInsightTestCase : LightPlatformCodeInsightTestCase() {
       val projDir = project.guessProjectDir()!!
       VfsUtil.copyDirectory(this, getVirtualFile(""), projDir, filter)
       // Delete any empty directories.
-      VfsUtil.visitChildrenRecursively(projDir, object: VirtualFileVisitor<Unit>() {
+      VfsUtil.visitChildrenRecursively(projDir, object : VirtualFileVisitor<Unit>() {
         override fun visitFile(file: VirtualFile): Boolean {
-          return if(file.isDirectory && file.children.isEmpty()) {
+          return if (file.isDirectory && file.children.isEmpty()) {
             file.delete(this)
             false
           } else {
@@ -33,7 +33,7 @@ abstract class GnCodeInsightTestCase : LightPlatformCodeInsightTestCase() {
   }
 
   fun copyTestFilesByPath(filter: (String) -> Boolean) {
-    copyTestFiles{
+    copyTestFiles {
       it.isDirectory || filter(VfsUtil.getRelativePath(it, getVirtualFile(""))!!)
     }
   }

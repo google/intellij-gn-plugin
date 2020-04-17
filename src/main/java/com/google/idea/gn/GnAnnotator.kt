@@ -4,36 +4,37 @@
 package com.google.idea.gn
 
 import com.google.idea.gn.psi.Builtin
-import com.google.idea.gn.psi.GnAssignment
 import com.google.idea.gn.psi.GnCall
+import com.google.idea.gn.psi.GnId
+import com.google.idea.gn.psi.builtin.TargetFunction
 import com.intellij.lang.annotation.AnnotationHolder
 import com.intellij.lang.annotation.Annotator
-import com.intellij.openapi.editor.DefaultLanguageHighlighterColors
 import com.intellij.psi.PsiElement
 
 class GnAnnotator : Annotator {
-  private fun annotateCall(call: GnCall, holder: AnnotationHolder) {
-    val identifier: PsiElement = call.id
-    if (Builtin.isBuiltIn(identifier)) {
-      val annotation = holder.createInfoAnnotation(identifier, null)
-      annotation.textAttributes = GnSyntaxHighlighter.BUILTIN_IDENTIFIER
+  private fun annotateIdentifier(identifier: GnId, holder: AnnotationHolder) {
+    val parent = identifier.parent
+    val text = identifier.text
+    val color = if (parent is GnCall) {
+      Builtin.FUNCTIONS[text]?.let {
+        if (it is TargetFunction) {
+          GnColors.TARGET_FUNCTION
+        } else {
+          GnColors.BUILTIN_FUNCTION
+        }
+      }
+    } else {
+      GnColors.VARIABLE
     }
-  }
-
-  private fun annotateAssignment(assignment: GnAssignment, holder: AnnotationHolder) {
-    val lvalue = assignment.lvalue
-    val id = lvalue.id
-    if (id != null) {
-      val a = holder.createInfoAnnotation(id, null)
-      a.textAttributes = DefaultLanguageHighlighterColors.INSTANCE_FIELD
+    color?.let {
+      val annotation = holder.createInfoAnnotation(identifier, null)
+      annotation.textAttributes = it.textAttributesKey
     }
   }
 
   override fun annotate(element: PsiElement, holder: AnnotationHolder) {
-    if (element is GnCall) {
-      annotateCall(element, holder)
-    } else if (element is GnAssignment) {
-      annotateAssignment(element, holder)
+    if (element is GnId) {
+      annotateIdentifier(element, holder)
     }
   }
 }

@@ -9,7 +9,8 @@ import com.intellij.psi.formatter.common.AbstractBlock
 import java.util.*
 
 class GnFormatBlock @JvmOverloads constructor(node: ASTNode, alignment: Alignment?,
-                                              private val mSpacingBuilder: SpacingBuilder, private val mIndent: Boolean = false) : AbstractBlock(node, Wrap.createWrap(WrapType.NONE, false), alignment) {
+                                              private val mSpacingBuilder: SpacingBuilder, private val mIndent: Boolean = false) : AbstractBlock(
+    node, Wrap.createWrap(WrapType.NONE, false), alignment) {
   private fun makeChild(node: ASTNode, indent: Boolean): GnFormatBlock {
     return GnFormatBlock(node, null, mSpacingBuilder, indent)
   }

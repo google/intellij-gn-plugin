@@ -6,7 +6,6 @@ package com.google.idea.gn.psi
 import com.google.idea.gn.GnKeys
 import com.google.idea.gn.psi.scope.BlockScope
 import com.google.idea.gn.psi.scope.Scope
-import com.intellij.ide.UiActivity
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile

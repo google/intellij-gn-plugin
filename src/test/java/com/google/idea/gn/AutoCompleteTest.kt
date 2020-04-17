@@ -78,7 +78,7 @@ class AutoCompleteTest : GnCodeInsightTestCase() {
     val dir = file.containingDirectory.virtualFile
     VfsUtil.visitChildrenRecursively(dir, object : VirtualFileVisitor<Unit>() {
       override fun visitFile(file: VirtualFile): Boolean {
-        if(!file.isDirectory) {
+        if (!file.isDirectory) {
           collected.add(VfsUtil.getRelativePath(file, dir)!!)
         }
         return true
