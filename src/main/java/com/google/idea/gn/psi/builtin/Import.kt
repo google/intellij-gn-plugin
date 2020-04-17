@@ -5,8 +5,11 @@ package com.google.idea.gn.psi.builtin
 
 import com.google.idea.gn.GnLabel
 import com.google.idea.gn.GnLanguage
-import com.google.idea.gn.psi.*
+import com.google.idea.gn.completion.CompletionIdentifier
 import com.google.idea.gn.psi.Function
+import com.google.idea.gn.psi.GnCall
+import com.google.idea.gn.psi.GnPsiUtil
+import com.google.idea.gn.psi.Visitor
 import com.google.idea.gn.psi.scope.Scope
 
 class Import : Function() {

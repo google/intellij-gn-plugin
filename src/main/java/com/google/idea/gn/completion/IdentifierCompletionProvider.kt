@@ -1,0 +1,76 @@
+//  Copyright (c) 2020 Google LLC All rights reserved.
+//  Use of this source code is governed by a BSD-style
+//  license that can be found in the LICENSE file.
+
+package com.google.idea.gn.completion
+
+import com.google.idea.gn.GnKeys
+import com.google.idea.gn.psi.*
+import com.google.idea.gn.psi.scope.FileScope
+import com.google.idea.gn.psi.scope.Scope
+import com.intellij.codeInsight.completion.CompletionParameters
+import com.intellij.codeInsight.completion.CompletionProvider
+import com.intellij.codeInsight.completion.CompletionResultSet
+import com.intellij.openapi.progress.ProgressManager
+import com.intellij.psi.PsiElement
+import com.intellij.psi.util.parentOfType
+import com.intellij.psi.util.parents
+import com.intellij.util.ProcessingContext
+
+class IdentifierCompletionProvider : CompletionProvider<CompletionParameters>() {
+  override fun addCompletions(parameters: CompletionParameters, context: ProcessingContext, _result: CompletionResultSet) {
+    val result = IdentifierCompletionResultSet(_result)
+
+    val file = parameters.originalFile
+    if (file !is GnFile) {
+      return
+    }
+
+    val originalPosition = parameters.originalPosition
+
+    val stopAt = originalPosition?.parentOfType(GnStatement::class,
+        GnBlock::class, GnFile::class) ?: file
+
+    val inFunction = originalPosition?.parentOfType(GnCall::class)
+        ?.getUserData(GnKeys.CALL_RESOLVED_FUNCTION)
+
+    val capturingVisitor = object : Visitor.VisitorDelegate() {
+      var finalScope: Scope? = null
+
+      override fun resolveCall(call: GnCall): Visitor.CallAction =
+          if (originalPosition?.parents()?.contains(call) == true) {
+            Visitor.CallAction.VISIT_BLOCK
+          } else {
+            Visitor.CallAction.SKIP
+          }
+
+
+      override fun afterVisit(element: PsiElement, scope: Scope): Boolean {
+        if (element == stopAt) {
+          finalScope = scope
+          return true
+        }
+        return false
+      }
+    }
+    file.accept(Visitor(FileScope(), capturingVisitor))
+    val scope = capturingVisitor.finalScope ?: file.scope
+
+
+    scope.gatherCompletionIdentifiers {
+      ProgressManager.checkCanceled()
+
+      if (it == inFunction) {
+        it.gatherChildren { child ->
+          result.addIdentifier(child)
+        }
+      }
+
+      // Don't suggest target functions within a target function.
+      if (inFunction?.identifierType != CompletionIdentifier.IdentifierType.TARGET_FUNCTION
+          || it.identifierType != CompletionIdentifier.IdentifierType.TARGET_FUNCTION) {
+        result.addIdentifier(it)
+      }
+    }
+  }
+}

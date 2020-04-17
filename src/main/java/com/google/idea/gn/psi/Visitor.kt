@@ -11,16 +11,23 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import com.intellij.psi.tree.IElementType
 
-class Visitor(scope: Scope, val interceptor: ScopeInterceptor? = null) : GnVisitor() {
+class Visitor(scope: Scope, private val interceptor: VisitorDelegate = object : VisitorDelegate() {}) : GnVisitor() {
 
   private var stop = false
 
-  abstract class ScopeInterceptor {
-    abstract fun afterVisit(element: PsiElement, scope: Scope): Boolean;
+  enum class CallAction {
+    SKIP,
+    EXECUTE,
+    VISIT_BLOCK
+  }
+
+  abstract class VisitorDelegate {
+    open fun afterVisit(element: PsiElement, scope: Scope): Boolean = false
+    open fun resolveCall(call: GnCall): CallAction = CallAction.EXECUTE
   }
 
   private fun interceptAfter(element: PsiElement) {
-    stop = interceptor?.afterVisit(element, scope) ?: false
+    stop = interceptor.afterVisit(element, scope)
   }
 
   override fun visitFile(file: PsiFile) {
@@ -65,20 +72,32 @@ class Visitor(scope: Scope, val interceptor: ScopeInterceptor? = null) : GnVisit
     }
     val f = scope.getFunction(call.id.text)
     call.putUserData(GnKeys.CALL_RESOLVED_FUNCTION, f)
-    call.block?.putUserData(GnKeys.CALL_RESOLVED_FUNCTION, f)
-    f?.execute(call, scope)
+    when (interceptor.resolveCall(call)) {
+      CallAction.SKIP -> Unit
+      CallAction.EXECUTE -> f?.execute(call, scope)
+      CallAction.VISIT_BLOCK -> call.block?.let { visitBlock(it, pushScope = true) }
+    }
     interceptAfter(call)
   }
 
-  override fun visitBlock(block: GnBlock) {
+  fun visitBlock(block: GnBlock, pushScope: Boolean) {
     ProgressManager.checkCanceled()
     if (stop) {
       return
     }
-    assert(scope is BlockScope)
+    if (pushScope) {
+      scope = BlockScope(scope)
+    } else {
+      assert(scope is BlockScope)
+    }
+
     visitStatementList(block.statementList)
     interceptAfter(block)
     scope = scope.parent!!
+  }
+
+  override fun visitBlock(block: GnBlock) {
+    visitBlock(block, pushScope = false)
   }
 
   override fun visitCondition(condition: GnCondition) {

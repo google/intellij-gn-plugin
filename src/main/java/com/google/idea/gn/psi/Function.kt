@@ -3,6 +3,7 @@
 //  license that can be found in the LICENSE file.
 package com.google.idea.gn.psi
 
+import com.google.idea.gn.completion.CompletionIdentifier
 import com.google.idea.gn.psi.scope.Scope
 
 abstract class Function : CompletionIdentifier {

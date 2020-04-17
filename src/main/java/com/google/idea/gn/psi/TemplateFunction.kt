@@ -3,6 +3,7 @@
 //  license that can be found in the LICENSE file.
 package com.google.idea.gn.psi
 
+import com.google.idea.gn.completion.CompletionIdentifier
 import com.google.idea.gn.psi.builtin.Template
 import com.google.idea.gn.psi.scope.BlockScope
 import com.google.idea.gn.psi.scope.Scope
@@ -25,7 +26,7 @@ class TemplateFunction(override val name: String, private val block: GnBlock) : 
       }
     }
 
-    Visitor(BlockScope(executionScope)).visitBlock(this.block)
+    Visitor(BlockScope(executionScope)).visitBlock(block)
   }
 
   override val identifierType: CompletionIdentifier.IdentifierType

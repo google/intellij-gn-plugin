@@ -2,7 +2,7 @@
 //  Use of this source code is governed by a BSD-style
 //  license that can be found in the LICENSE file.
 
-package com.google.idea.gn.psi
+package com.google.idea.gn.completion
 
 import com.intellij.codeInsight.AutoPopupController
 import com.intellij.codeInsight.completion.CompletionResultSet
@@ -21,6 +21,7 @@ interface CompletionIdentifier {
     FUNCTION,
     TARGET_FUNCTION,
     VARIABLE,
+    FUNCTION_VARIABLE,
     TEMPLATE;
 
     val icon: Icon
@@ -29,6 +30,7 @@ interface CompletionIdentifier {
         TARGET_FUNCTION -> LayeredIcon.create(AllIcons.Nodes.Target, AllIcons.Nodes.Shared)
         VARIABLE -> AllIcons.Nodes.Variable
         TEMPLATE -> AllIcons.Actions.Lightning
+        FUNCTION_VARIABLE -> LayeredIcon.create(AllIcons.Nodes.Variable, AllIcons.Nodes.StaticMark)
       }
   }
 
@@ -39,7 +41,7 @@ interface CompletionIdentifier {
   fun gatherChildren(operator: (CompletionIdentifier) -> Unit) = Unit
 
   fun addToResult(resultSet: CompletionResultSet) {
-
+    resultSet.startBatch()
     val element = LookupElementBuilder.create(insertionText)
         .withPresentableText(name)
         .withIcon(identifierType.icon)

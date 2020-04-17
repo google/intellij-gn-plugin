@@ -3,8 +3,11 @@
 //  license that can be found in the LICENSE file.
 package com.google.idea.gn.psi.builtin
 
-import com.google.idea.gn.psi.*
+import com.google.idea.gn.completion.CompletionIdentifier
 import com.google.idea.gn.psi.Function
+import com.google.idea.gn.psi.GnCall
+import com.google.idea.gn.psi.GnPsiUtil
+import com.google.idea.gn.psi.TemplateFunction
 import com.google.idea.gn.psi.scope.Scope
 
 class Template : Function() {

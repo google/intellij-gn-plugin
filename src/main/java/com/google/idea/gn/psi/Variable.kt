@@ -3,6 +3,8 @@
 //  license that can be found in the LICENSE file.
 package com.google.idea.gn.psi
 
+import com.google.idea.gn.completion.CompletionIdentifier
+
 class Variable(override val name: String) : CompletionIdentifier {
   constructor(name: String, value: GnValue?) : this(name) {
     this.value = value

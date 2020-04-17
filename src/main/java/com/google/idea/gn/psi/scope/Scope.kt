@@ -3,6 +3,7 @@
 //  license that can be found in the LICENSE file.
 package com.google.idea.gn.psi.scope
 
+import com.google.idea.gn.completion.CompletionIdentifier
 import com.google.idea.gn.psi.*
 import com.google.idea.gn.psi.Function
 import com.google.idea.gn.psi.Target
@@ -55,13 +56,13 @@ abstract class Scope protected constructor(val parent: Scope?) {
   }
 
   fun gatherCompletionIdentifiers(operator: (CompletionIdentifier) -> Unit) {
-    variables?.forEach {
-      operator(it.value)
-    }
+    parent?.gatherCompletionIdentifiers(operator)
     functions.forEach {
       operator(it)
     }
-    parent?.gatherCompletionIdentifiers(operator)
+    variables?.forEach {
+      operator(it.value)
+    }
   }
 
   override fun toString(): String {
