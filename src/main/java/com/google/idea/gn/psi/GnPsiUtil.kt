@@ -1,6 +1,6 @@
-//  Copyright (c) 2020 Google LLC All rights reserved.
-//  Use of this source code is governed by a BSD-style
-//  license that can be found in the LICENSE file.
+// Copyright (c) 2020 Google LLC All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
 package com.google.idea.gn.psi
 
 import com.google.idea.gn.GnLabel
@@ -118,7 +118,7 @@ object GnPsiUtil {
   private fun evaluateLiteral(literal: GnLiteralExpr, scope: Scope): GnValue? {
     val def = literal.firstChild
     if (def is GnStringExpr) {
-      return evaluateStringExpr(def, scope);
+      return evaluateStringExpr(def, scope)
     }
     return when (def.node.elementType) {
       Types.TRUE -> GnValue(true)

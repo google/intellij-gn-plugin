@@ -1,6 +1,6 @@
-//  Copyright (c) 2020 Google LLC All rights reserved.
-//  Use of this source code is governed by a BSD-style
-//  license that can be found in the LICENSE file.
+// Copyright (c) 2020 Google LLC All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
 
 {
   parserClass = "com.google.idea.gn.parser.GnParser"
@@ -148,4 +148,6 @@ collection ::= OBRACKET expr-list [COMMA] CBRACKET
 expr-list ::= [expr (COMMA expr)*]
 
 assign-op ::= EQUAL | PLUS_EQUAL | MINUS_EQUAL
-id ::= IDENTIFIER
+id ::= IDENTIFIER {
+   mixin = "GnIdentifierImpl"
+}

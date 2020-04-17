@@ -1,6 +1,6 @@
-//  Copyright (c) 2020 Google LLC All rights reserved.
-//  Use of this source code is governed by a BSD-style
-//  license that can be found in the LICENSE file.
+// Copyright (c) 2020 Google LLC All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
 package com.google.idea.gn
 
 import com.intellij.openapi.util.text.StringUtil
@@ -46,7 +46,7 @@ class GnLabel private constructor() {
 
   companion object {
     private val PATH_PATTERN = Pattern.compile(
-        """(//)?([a-zA-Z0-9\$ \-_\./]*)(\:[a-zA-Z0-9_\-\$\.]*)?(\([a-zA-Z0-9_\-\$\.]*\))?""")
+        """(//)?([a-zA-Z0-9$ \-_./]*)(:[a-zA-Z0-9_\-$.]*)?(\([a-zA-Z0-9_\-$.]*\))?""")
 
     @kotlin.jvm.JvmStatic
     fun parse(path: String?): GnLabel? {
