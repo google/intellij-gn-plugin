@@ -118,9 +118,9 @@ class GnCompletionContributor : CompletionContributor() {
               if (state.foundBuildFile) {
                 if (!state.foundNamedTarget) {
                   val path = getPath(file)
-                  if (path.isNotEmpty()) {
+                  if (path.isNotEmpty() && path != "//") {
                     result.addElement(
-                        createElementBuilderWithIcon(getPath(file), CompleteType.DIRECTORY))
+                        createElementBuilderWithIcon(path, CompleteType.DIRECTORY))
                   }
                 }
                 if (!stack.empty()) {
