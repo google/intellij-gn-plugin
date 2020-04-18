@@ -50,6 +50,9 @@ class AnnotatorTest : GnCodeInsightTestCase() {
         forward_variables_from(invoker, "*")
       }
     }
+    
+    my_template("foo") {
+    }
     """.trimIndent())
     val highlight = CodeInsightTestFixtureImpl.instantiateAndRun(file, editor, IntArray(0), false)
     assertEquals(listOf(
@@ -61,7 +64,8 @@ class AnnotatorTest : GnCodeInsightTestCase() {
         HighlightChecker("b", GnColors.VARIABLE),
         HighlightChecker("group", GnColors.TARGET_FUNCTION),
         HighlightChecker("target_name", GnColors.VARIABLE),
-        HighlightChecker("invoker", GnColors.VARIABLE)
+        HighlightChecker("invoker", GnColors.VARIABLE),
+        HighlightChecker("my_template", GnColors.TEMPLATE)
     ), highlight.map { HighlightChecker(it) })
   }
 
