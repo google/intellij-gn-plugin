@@ -41,7 +41,7 @@ class GnColorSettingsPage : ColorSettingsPage {
       }
     }
     
-    <template>my_template<template>("hello") {
+    <template>my_template</template>("hello") {
       <var>deps</var> = ["//lib:my_lib"]
     }
   """.trimIndent()

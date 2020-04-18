@@ -11,7 +11,7 @@ import com.intellij.openapi.editor.DefaultLanguageHighlighterColors as Default
 enum class GnColors(humanName: String, default: TextAttributesKey? = null) {
   BUILTIN_FUNCTION("Function", Default.PREDEFINED_SYMBOL),
   TARGET_FUNCTION("Builtin Target rule", Default.KEYWORD),
-  TEMPLATE("Template call", Default.CLASS_REFERENCE),
+  TEMPLATE("Template call", Default.FUNCTION_CALL),
   COMMENT("Comment", Default.LINE_COMMENT),
   STRING("String", Default.STRING),
   VARIABLE("Variable", Default.INSTANCE_FIELD),
