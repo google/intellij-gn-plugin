@@ -9,6 +9,7 @@ import com.google.idea.gn.GnKeys
 import com.google.idea.gn.GnLabel
 import com.google.idea.gn.psi.GnFile
 import com.google.idea.gn.psi.Target
+import com.google.idea.gn.util.getPathLabel
 import com.intellij.codeInsight.completion.CompletionParameters
 import com.intellij.codeInsight.completion.CompletionProvider
 import com.intellij.codeInsight.completion.CompletionResultSet
@@ -25,7 +26,6 @@ import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiManager
 import com.intellij.util.ProcessingContext
 import com.intellij.util.text.Matcher
-import java.io.StringWriter
 import java.util.*
 
 class FileCompletionProvider @JvmOverloads constructor(private val mFileMatcher: Matcher, private val skipFileName: Boolean = false, private val parseTargets: Boolean = false) : CompletionProvider<CompletionParameters>() {
@@ -84,18 +84,8 @@ class FileCompletionProvider @JvmOverloads constructor(private val mFileMatcher:
     VfsUtilCore.visitChildrenRecursively(directory,
         object : VirtualFileVisitor<Void?>(
             limit(5)) {
-          private fun getPath(file: VirtualFile): String {
-            val writer = StringWriter()
-            if (absolute) {
-              writer.write("//")
-            }
-            val relative = VfsUtilCore.getRelativePath(
-                file, base)
-            if (relative != null && relative.isNotEmpty()) {
-              writer.write(relative)
-            }
-            return writer.toString()
-          }
+
+          private fun getPath(file: VirtualFile): String = getPathLabel(file, base, absolute) ?: ""
 
           override fun afterChildrenVisited(file: VirtualFile) {
             super.afterChildrenVisited(file)

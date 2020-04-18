@@ -46,8 +46,9 @@
     <enterBetweenBracesDelegate implementationClass="com.google.idea.gn.GnEnterDelegate"
         language="gn"/>
     <colorSettingsPage implementation="com.google.idea.gn.GnColorSettingsPage"/>
-  </extensions>
 
+    <documentationProvider implementation="com.google.idea.gn.GnDocumentationProvider"/>
+  </extensions>
 
   <actions>
     <!-- Add your actions here -->
