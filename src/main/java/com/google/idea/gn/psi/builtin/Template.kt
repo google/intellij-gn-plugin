@@ -12,9 +12,8 @@ import com.google.idea.gn.psi.scope.Scope
 
 class Template : Function() {
   override fun execute(call: GnCall, targetScope: Scope) {
-    val block = call.block ?: return
     val name = GnPsiUtil.evaluateFirstToString(call.exprList, targetScope) ?: return
-    targetScope.installFunction(TemplateFunction(name, block))
+    targetScope.installFunction(TemplateFunction(name, call))
   }
 
   override val identifierType: CompletionIdentifier.IdentifierType

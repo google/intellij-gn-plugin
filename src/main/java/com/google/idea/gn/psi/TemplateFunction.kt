@@ -9,24 +9,25 @@ import com.google.idea.gn.psi.scope.BlockScope
 import com.google.idea.gn.psi.scope.Scope
 import com.google.idea.gn.psi.scope.TemplateScope
 
-class TemplateFunction(override val name: String, private val block: GnBlock) : Function() {
+class TemplateFunction(override val name: String, val declaration: GnCall) : Function() {
   override fun execute(call: GnCall, targetScope: Scope) {
+    val declarationBlock = declaration.block ?: return
     val executionScope: BlockScope = TemplateScope(targetScope, call)
 
     executionScope.addVariable(
         Variable(Template.TARGET_NAME,
             GnPsiUtil.evaluateFirst(call.exprList, targetScope)))
 
-    call.block?.let { block ->
+    call.block?.let { callBlock ->
       val innerScope: Scope = BlockScope(targetScope)
-      Visitor(innerScope).visitBlock(block)
+      Visitor(innerScope).visitBlock(callBlock)
       innerScope.consolidateVariables()?.let {
         executionScope
             .addVariable(Variable(Template.INVOKER, GnValue(it)))
       }
     }
 
-    Visitor(BlockScope(executionScope)).visitBlock(block)
+    Visitor(BlockScope(executionScope)).visitBlock(declarationBlock)
   }
 
   override val identifierType: CompletionIdentifier.IdentifierType

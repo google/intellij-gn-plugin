@@ -6,6 +6,8 @@ package com.google.idea.gn.completion
 
 import com.google.idea.gn.GnKeys
 import com.google.idea.gn.psi.*
+import com.google.idea.gn.psi.Function
+import com.google.idea.gn.psi.builtin.Import
 import com.google.idea.gn.psi.builtin.Template
 import com.google.idea.gn.psi.scope.FileScope
 import com.google.idea.gn.psi.scope.Scope
@@ -35,18 +37,12 @@ class IdentifierCompletionProvider : CompletionProvider<CompletionParameters>() 
     val capturingVisitor = object : Visitor.VisitorDelegate() {
       var finalScope: Scope? = null
 
-      override fun resolveCall(call: GnCall): Visitor.CallAction =
+      override fun resolveCall(call: GnCall, function: Function?): Visitor.CallAction =
           when {
-            call.getUserData(GnKeys.CALL_RESOLVED_FUNCTION) is Template -> {
-              // Template calls must be executed so they show up in the scope.
-              Visitor.CallAction.EXECUTE
-            }
-            position.parents().contains(call) -> {
-              Visitor.CallAction.VISIT_BLOCK
-            }
-            else -> {
-              Visitor.CallAction.SKIP
-            }
+            // Template and import calls must be executed so they show up in the scope.
+            function is Template || function is Import -> Visitor.CallAction.EXECUTE
+            position.parents().contains(call) -> Visitor.CallAction.VISIT_BLOCK
+            else -> Visitor.CallAction.SKIP
           }
 
 

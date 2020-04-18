@@ -5,9 +5,9 @@ package com.google.idea.gn.psi.impl
 
 import com.google.idea.gn.GnLabel
 import com.google.idea.gn.psi.GnFile
-import com.google.idea.gn.psi.GnLabelReference
 import com.google.idea.gn.psi.GnPsiUtil
 import com.google.idea.gn.psi.GnStringExpr
+import com.google.idea.gn.psi.reference.GnLabelReference
 import com.intellij.extapi.psi.ASTWrapperPsiElement
 import com.intellij.lang.ASTNode
 import com.intellij.psi.PsiReference

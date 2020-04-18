@@ -23,7 +23,7 @@ class Visitor(scope: Scope, private val interceptor: VisitorDelegate = object : 
 
   abstract class VisitorDelegate {
     open fun afterVisit(element: PsiElement, scope: Scope): Boolean = false
-    open fun resolveCall(call: GnCall): CallAction = CallAction.EXECUTE
+    open fun resolveCall(call: GnCall, function: Function?): CallAction = CallAction.EXECUTE
   }
 
   private fun interceptAfter(element: PsiElement) {
@@ -72,7 +72,7 @@ class Visitor(scope: Scope, private val interceptor: VisitorDelegate = object : 
     }
     val f = scope.getFunction(call.id.text)
     call.putUserData(GnKeys.CALL_RESOLVED_FUNCTION, f)
-    when (interceptor.resolveCall(call)) {
+    when (interceptor.resolveCall(call, f)) {
       CallAction.SKIP -> Unit
       CallAction.EXECUTE -> f?.execute(call, scope)
       CallAction.VISIT_BLOCK -> call.block?.let { visitBlock(it, pushScope = true) }
