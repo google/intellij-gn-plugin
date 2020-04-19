@@ -19,6 +19,7 @@
     </ul>
     ]]></description>
 
+
   <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
        on how to target different products -->
   <depends>com.intellij.modules.lang</depends>
@@ -49,8 +50,4 @@
 
     <documentationProvider implementation="com.google.idea.gn.GnDocumentationProvider"/>
   </extensions>
-
-  <actions>
-    <!-- Add your actions here -->
-  </actions>
 </idea-plugin>

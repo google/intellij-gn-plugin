@@ -12,7 +12,6 @@ import com.google.idea.gn.psi.builtin.Import
 import com.intellij.codeInsight.completion.CompletionContributor
 import com.intellij.codeInsight.completion.CompletionInitializationContext
 import com.intellij.codeInsight.completion.CompletionType
-import com.intellij.openapi.diagnostic.Logger
 import com.intellij.patterns.PlatformPatterns
 import com.intellij.patterns.PlatformPatterns.psiElement
 import com.intellij.util.text.Matcher
@@ -20,7 +19,6 @@ import com.intellij.util.text.Matcher
 class GnCompletionContributor : CompletionContributor() {
 
   companion object {
-    val LOGGER = Logger.getInstance(GnCompletionContributor::class.toString())
     const val DUMMY_ID = "gn_dummy_completion_"
   }
 

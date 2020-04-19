@@ -14,8 +14,7 @@ import com.intellij.psi.PsiReference
 
 abstract class GnLiteralReferenceImpl(node: ASTNode) : ASTWrapperPsiElement(node), GnStringExpr {
   override fun getReference(): PsiReference? {
-    val file = containingFile
-    val scope = when (file) {
+    val scope = when (val file = containingFile) {
       is GnFile -> file.scope
       else -> return null
     }

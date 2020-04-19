@@ -13,8 +13,7 @@ import com.intellij.psi.PsiReference
 
 abstract class GnIdentifierImpl(node: ASTNode) : ASTWrapperPsiElement(node), PsiElement {
   override fun getReference(): PsiReference? {
-    val parent = parent
-    return when (parent) {
+    return when (val parent = parent) {
       is GnCall -> GnCallIdentifierReference(parent)
       else -> null
     }

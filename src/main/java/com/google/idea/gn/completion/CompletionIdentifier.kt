@@ -51,7 +51,7 @@ interface CompletionIdentifier {
     val element = LookupElementBuilder.create(name)
         .withIcon(identifierType.icon)
         .withTypeText(typeString)
-        .withInsertHandler { ctx, it ->
+        .withInsertHandler { ctx, _ ->
           postInsertType?.let {
             ctx.document.insertString(ctx.tailOffset, it.extra)
             ctx.editor.caretModel.primaryCaret.moveCaretRelatively(it.caretShift, 0, false, false)
