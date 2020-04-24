@@ -10,11 +10,13 @@ object Builtin {
   val DEPS by lazy { FunctionVariable("deps", GnValue.Type.LIST) }
   val PUBLIC_DEPS by lazy { FunctionVariable("public_deps", GnValue.Type.LIST) }
   val DATA_DEPS by lazy { FunctionVariable("data_deps", GnValue.Type.LIST) }
+  val INVOKER by lazy { FunctionVariable("invoker", GnValue.Type.SCOPE) }
 
   val SOURCES by lazy { FunctionVariable("sources", GnValue.Type.LIST) }
 
+
   val FUNCTIONS: Map<String, Function> by lazy {
     arrayOf(Group(), SourceSet(), Executable(), Import(),
-        Template()).associateBy { it.name }
+        Template(), ForwardVariablesFrom()).associateBy { it.name }
   }
 }

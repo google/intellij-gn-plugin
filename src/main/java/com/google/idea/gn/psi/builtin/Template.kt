@@ -13,7 +13,7 @@ import com.google.idea.gn.psi.scope.Scope
 class Template : Function() {
   override fun execute(call: GnCall, targetScope: Scope) {
     val name = GnPsiUtil.evaluateFirstToString(call.exprList, targetScope) ?: return
-    targetScope.installFunction(TemplateFunction(name, call))
+    targetScope.installFunction(TemplateFunction(name, call, targetScope))
   }
 
   override val identifierType: CompletionIdentifier.IdentifierType
@@ -31,6 +31,5 @@ class Template : Function() {
   companion object {
     const val NAME = "template"
     const val TARGET_NAME = "target_name"
-    const val INVOKER = "invoker"
   }
 }

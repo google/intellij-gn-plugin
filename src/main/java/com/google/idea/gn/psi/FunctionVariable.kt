@@ -6,11 +6,11 @@ package com.google.idea.gn.psi
 
 import com.google.idea.gn.completion.CompletionIdentifier
 
-class FunctionVariable(override val name: String, val type: GnValue.Type) : CompletionIdentifier {
+class FunctionVariable(override val name: String, val type: GnValue.Type? = null) : CompletionIdentifier {
 
   override val identifierType: CompletionIdentifier.IdentifierType
     get() = CompletionIdentifier.IdentifierType.FUNCTION_VARIABLE
 
   override val typeString: String?
-    get() = type.toString()
+    get() = type?.toString()
 }

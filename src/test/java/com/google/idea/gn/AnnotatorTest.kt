@@ -64,6 +64,7 @@ class AnnotatorTest : GnCodeInsightTestCase() {
         HighlightChecker("b", GnColors.VARIABLE),
         HighlightChecker("group", GnColors.TARGET_FUNCTION),
         HighlightChecker("target_name", GnColors.VARIABLE),
+        HighlightChecker("forward_variables_from", GnColors.BUILTIN_FUNCTION),
         HighlightChecker("invoker", GnColors.VARIABLE),
         HighlightChecker("my_template", GnColors.TEMPLATE)
     ), highlight.map { HighlightChecker(it) })

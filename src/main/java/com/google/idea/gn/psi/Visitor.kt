@@ -11,7 +11,7 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import com.intellij.psi.tree.IElementType
 
-class Visitor(scope: Scope, private val interceptor: VisitorDelegate = object : VisitorDelegate() {}) : GnVisitor() {
+class Visitor(scope: Scope, private val delegate: VisitorDelegate = object : VisitorDelegate() {}) : GnVisitor() {
 
   private var stop = false
 
@@ -24,10 +24,12 @@ class Visitor(scope: Scope, private val interceptor: VisitorDelegate = object : 
   abstract class VisitorDelegate {
     open fun afterVisit(element: PsiElement, scope: Scope): Boolean = false
     open fun resolveCall(call: GnCall, function: Function?): CallAction = CallAction.EXECUTE
+    open fun shouldExecuteExpr(expr: GnExpr): Boolean = true
+    open val observeConditions: Boolean get() = true
   }
 
   private fun interceptAfter(element: PsiElement) {
-    stop = interceptor.afterVisit(element, scope)
+    stop = delegate.afterVisit(element, scope)
   }
 
   override fun visitFile(file: PsiFile) {
@@ -72,7 +74,7 @@ class Visitor(scope: Scope, private val interceptor: VisitorDelegate = object : 
     }
     val f = scope.getFunction(call.id.text)
     call.putUserData(GnKeys.CALL_RESOLVED_FUNCTION, f)
-    when (interceptor.resolveCall(call, f)) {
+    when (delegate.resolveCall(call, f)) {
       CallAction.SKIP -> Unit
       CallAction.EXECUTE -> f?.execute(call, scope)
       CallAction.VISIT_BLOCK -> call.block?.let { visitBlock(it, pushScope = true) }
@@ -80,7 +82,7 @@ class Visitor(scope: Scope, private val interceptor: VisitorDelegate = object : 
     interceptAfter(call)
   }
 
-  fun visitBlock(block: GnBlock, pushScope: Boolean) {
+  private fun visitBlock(block: GnBlock, pushScope: Boolean) {
     ProgressManager.checkCanceled()
     if (stop) {
       return
@@ -100,24 +102,41 @@ class Visitor(scope: Scope, private val interceptor: VisitorDelegate = object : 
     visitBlock(block, pushScope = false)
   }
 
+  private fun evalExpr(expr: GnExpr): GnValue? =
+      if (delegate.shouldExecuteExpr(expr)) {
+        GnPsiUtil.evaluate(expr, scope)
+      } else {
+        null
+      }
+
+
   override fun visitCondition(condition: GnCondition) {
     ProgressManager.checkCanceled()
     if (stop) {
       return
     }
-    val result: GnValue? = GnPsiUtil.evaluate(condition.expr ?: return, scope)
-    if (result?.bool == true) { // Visit statement list directly, there's no scope created by condition blocks.
+    val result: GnValue? = evalExpr(condition.expr ?: return)
+
+    if (delegate.observeConditions) {
+      if (result?.bool == true) { // Visit statement list directly, there's no scope created by condition blocks.
+        condition.block?.statementList?.let { visitStatementList(it) }
+        return
+      }
+    } else {
+      // Just visit all statements if observeConditions is not set.
       condition.block?.statementList?.let { visitStatementList(it) }
-      return
     }
+
     val elseCondition = condition.elseCondition ?: return
-    val elseBlock = elseCondition.block
-    if (elseBlock != null) {
-      visitStatementList(elseBlock.statementList)
+    // else block
+    elseCondition.block?.let {
+      visitStatementList(it.statementList)
       return
     }
-    val elseIfCondition = elseCondition.condition
-    elseIfCondition?.let { visitCondition(it) }
+    // else if
+    elseCondition.condition?.let {
+      visitCondition(it)
+    }
   }
 
   override fun visitAssignment(assignment: GnAssignment) {
@@ -127,7 +146,7 @@ class Visitor(scope: Scope, private val interceptor: VisitorDelegate = object : 
     }
     val type = AssignType.fromNode(assignment.assignOp.firstChild.node.elementType) ?: return
     val target = createAssignmentTarget(assignment.lvalue, type) ?: return
-    val result = GnPsiUtil.evaluate(assignment.expr, scope)
+    val result = evalExpr(assignment.expr)
 
     target.variableValue = when (type) {
       AssignType.EQUAL -> result
@@ -196,7 +215,7 @@ class Visitor(scope: Scope, private val interceptor: VisitorDelegate = object : 
     lvalue.arrayAccess?.let { arrayAccess ->
       val first = arrayAccess.id.text
       val variable = scope.getVariable(first) ?: return null
-      val index = GnPsiUtil.evaluate(arrayAccess.expr, scope)?.int ?: return null
+      val index = evalExpr(arrayAccess.expr)?.int ?: return null
       if (index >= variable.value?.list?.size ?: 0) {
         return null
       }

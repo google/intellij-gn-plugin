@@ -4,6 +4,7 @@
 
 package com.google.idea.gn.util
 
+import com.google.idea.gn.psi.GnFile
 import com.intellij.openapi.application.runWriteAction
 import com.intellij.openapi.project.guessProjectDir
 import com.intellij.openapi.vfs.VfsUtil
@@ -15,6 +16,8 @@ import com.intellij.testFramework.LightPlatformCodeInsightTestCase
 
 abstract class GnCodeInsightTestCase : LightPlatformCodeInsightTestCase() {
   override fun getTestDataPath() = "src/test/testData/project/"
+
+  val gnFile: GnFile get() = file as GnFile
 
   fun getProjectFile(path: String): VirtualFile? =
       project.guessProjectDir()!!.findFileByRelativePath(path)
