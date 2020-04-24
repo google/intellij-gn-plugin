@@ -3,7 +3,7 @@
 <!-- license that can be found in the LICENSE file. -->
 
 <idea-plugin>
-  <id>fuchsia.developer.plugin.gn</id>
+  <id>com.google.idea.gn</id>
   <name>GN</name>
   <vendor
       url="https://fuchsia.googlesource.com/intellij-language-gn/">The Fuchsia Authors
