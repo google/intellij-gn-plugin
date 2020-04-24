@@ -6,12 +6,12 @@ package com.google.idea.gn.psi
 import com.google.idea.gn.completion.CompletionIdentifier
 import com.google.idea.gn.psi.scope.Scope
 
-abstract class Function : CompletionIdentifier {
-  abstract fun execute(call: GnCall,
-                       targetScope: Scope)
+interface Function : CompletionIdentifier {
+  fun execute(call: GnCall,
+              targetScope: Scope)
 
-  abstract val isBuiltin: Boolean
-  open val variables: Map<String, FunctionVariable> = emptyMap()
+  val isBuiltin: Boolean
+  val variables: Map<String, FunctionVariable> get() = emptyMap()
 
   override val postInsertType: CompletionIdentifier.PostInsertType?
     get() = CompletionIdentifier.PostInsertType.CALL

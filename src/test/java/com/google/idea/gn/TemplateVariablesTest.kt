@@ -6,7 +6,7 @@ package com.google.idea.gn
 import com.google.idea.gn.psi.Function
 import com.google.idea.gn.psi.GnFile
 import com.google.idea.gn.psi.Types
-import com.google.idea.gn.psi.builtin.Group
+import com.google.idea.gn.psi.builtin.BuiltinTargetFunction
 import com.google.idea.gn.util.GnCodeInsightTestCase
 import com.google.idea.gn.util.findElementMatching
 import com.intellij.patterns.PlatformPatterns.psiElement
@@ -82,7 +82,7 @@ class TemplateVariablesTest : GnCodeInsightTestCase() {
       foo("bar") {}
     """.trimIndent())
 
-    assertEquals(Group().variables, f.variables)
+    assertEquals(BuiltinTargetFunction.GROUP.variables, f.variables)
   }
 
   fun testForwardFromTemplate() {

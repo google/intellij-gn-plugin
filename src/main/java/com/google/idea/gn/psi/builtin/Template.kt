@@ -10,7 +10,7 @@ import com.google.idea.gn.psi.GnPsiUtil
 import com.google.idea.gn.psi.TemplateFunction
 import com.google.idea.gn.psi.scope.Scope
 
-class Template : Function() {
+class Template : Function {
   override fun execute(call: GnCall, targetScope: Scope) {
     val name = GnPsiUtil.evaluateFirstToString(call.exprList, targetScope) ?: return
     targetScope.installFunction(TemplateFunction(name, call, targetScope))
@@ -22,7 +22,7 @@ class Template : Function() {
   override val isBuiltin: Boolean
     get() = true
 
-  override val name: String
+  override val identifierName: String
     get() = NAME
 
   override val postInsertType: CompletionIdentifier.PostInsertType?

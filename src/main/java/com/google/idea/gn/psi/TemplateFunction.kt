@@ -5,6 +5,7 @@ package com.google.idea.gn.psi
 
 import com.google.idea.gn.GnKeys
 import com.google.idea.gn.completion.CompletionIdentifier
+import com.google.idea.gn.psi.builtin.BuiltinVariable
 import com.google.idea.gn.psi.builtin.ForwardVariablesFrom
 import com.google.idea.gn.psi.builtin.Template
 import com.google.idea.gn.psi.scope.BlockScope
@@ -15,7 +16,7 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiElementVisitor
 import com.intellij.psi.util.parentsOfType
 
-class TemplateFunction(override val name: String, val declaration: GnCall, val declarationScope: Scope) : Function() {
+class TemplateFunction(override val identifierName: String, val declaration: GnCall, val declarationScope: Scope) : Function {
   override fun execute(call: GnCall, targetScope: Scope) {
     val declarationBlock = declaration.block ?: return
     val executionScope: BlockScope = TemplateScope(declarationScope, call)
@@ -29,7 +30,7 @@ class TemplateFunction(override val name: String, val declaration: GnCall, val d
       Visitor(innerScope).visitBlock(callBlock)
       innerScope.consolidateVariables()?.let {
         executionScope
-            .addVariable(Variable(Builtin.INVOKER.name, GnValue(it)))
+            .addVariable(Variable(BuiltinVariable.INVOKER.identifierName, GnValue(it)))
       }
     }
 
@@ -56,14 +57,14 @@ class TemplateFunction(override val name: String, val declaration: GnCall, val d
         if (exprList.size < 2) {
           return
         }
-        if (!exprList[0].textMatches(Builtin.INVOKER.name)) {
+        if (!exprList[0].textMatches(BuiltinVariable.INVOKER.identifierName)) {
           return
         }
         // We're evaluating on built-in scope assuming that variables are usually set as literals.
         val forward = GnPsiUtil.evaluate(exprList[1], BuiltinScope)
         forward?.list?.let { vars ->
           val varMap = vars.mapNotNull {
-            it.string?.let { s -> Pair(s, FunctionVariable(s)) }
+            it.string?.let { s -> Pair(s, TemplateVariable(s)) }
           }
           variables.putAll(varMap)
           return
@@ -105,11 +106,11 @@ class TemplateFunction(override val name: String, val declaration: GnCall, val d
               return
             }
             val first = element.idList[0]
-            if (!first.textMatches(Builtin.INVOKER.name)) {
+            if (!first.textMatches(BuiltinVariable.INVOKER.identifierName)) {
               return
             }
             val second = element.idList[1].text
-            variables[second] = FunctionVariable(second)
+            variables[second] = TemplateVariable(second)
           }
         })
         return false

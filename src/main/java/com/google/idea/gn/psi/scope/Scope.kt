@@ -34,7 +34,7 @@ abstract class Scope protected constructor(val parent: Scope?) {
     if (_variables == null) {
       _variables = HashMap()
     }
-    _variables!![v.name] = v
+    _variables!![v.identifierName] = v
   }
 
   open fun getVariable(name: String): Variable? {
@@ -66,7 +66,7 @@ abstract class Scope protected constructor(val parent: Scope?) {
   }
 
   override fun toString(): String {
-    return "$parent{Scope(variables: ${variables?.values?.joinToString { it.name }}, functions:${functions.joinToString { it.name }})}"
+    return "$parent{Scope(variables: ${variables?.values?.joinToString { it.identifierName }}, functions:${functions.joinToString { it.identifierName }})}"
   }
 
   private var _variables: MutableMap<String, Variable>? = null

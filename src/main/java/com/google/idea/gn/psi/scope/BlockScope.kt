@@ -12,7 +12,7 @@ open class BlockScope(parent: Scope?) : Scope(parent) {
   }
 
   override fun installFunction(function: Function) {
-    installedFunctions[function.name] = function
+    installedFunctions[function.identifierName] = function
   }
 
   fun intoValue(): GnValue? {

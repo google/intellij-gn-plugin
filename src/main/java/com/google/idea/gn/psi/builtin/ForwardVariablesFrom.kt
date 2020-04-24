@@ -8,7 +8,7 @@ import com.google.idea.gn.psi.Function
 import com.google.idea.gn.psi.GnCall
 import com.google.idea.gn.psi.scope.Scope
 
-class ForwardVariablesFrom : Function() {
+class ForwardVariablesFrom : Function {
 
   override fun execute(call: GnCall, targetScope: Scope) {
     // TODO implement variable forwarding
@@ -16,7 +16,7 @@ class ForwardVariablesFrom : Function() {
 
   override val isBuiltin: Boolean
     get() = true
-  override val name: String
+  override val identifierName: String
     get() = NAME
   override val identifierType: CompletionIdentifier.IdentifierType
     get() = CompletionIdentifier.IdentifierType.FUNCTION

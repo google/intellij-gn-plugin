@@ -6,7 +6,7 @@ package com.google.idea.gn
 import com.google.idea.gn.psi.Builtin
 import com.google.idea.gn.psi.GnCall
 import com.google.idea.gn.psi.GnId
-import com.google.idea.gn.psi.builtin.TargetFunction
+import com.google.idea.gn.psi.builtin.BuiltinTargetFunction
 import com.google.idea.gn.psi.reference.GnCallIdentifierReference
 import com.intellij.lang.annotation.AnnotationHolder
 import com.intellij.lang.annotation.Annotator
@@ -21,7 +21,7 @@ class GnAnnotator : Annotator {
       }
     }
     return Builtin.FUNCTIONS[identifier.text]?.let {
-      if (it is TargetFunction) {
+      if (it is BuiltinTargetFunction) {
         GnColors.TARGET_FUNCTION
       } else {
         GnColors.BUILTIN_FUNCTION

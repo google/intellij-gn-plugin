@@ -12,7 +12,7 @@ import com.google.idea.gn.psi.GnPsiUtil
 import com.google.idea.gn.psi.Visitor
 import com.google.idea.gn.psi.scope.Scope
 
-class Import : Function() {
+class Import : Function {
   override fun execute(call: GnCall, targetScope: Scope) {
     val name = GnPsiUtil.evaluateFirstToString(call.exprList, targetScope) ?: return
     val label: GnLabel = GnLabel.parse(name) ?: return
@@ -29,7 +29,7 @@ class Import : Function() {
   override val isBuiltin: Boolean
     get() = true
 
-  override val name: String
+  override val identifierName: String
     get() = NAME
 
   override val autoSuggestOnInsertion: Boolean

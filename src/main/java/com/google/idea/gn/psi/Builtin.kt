@@ -3,20 +3,19 @@
 // license that can be found in the LICENSE file.
 package com.google.idea.gn.psi
 
-import com.google.idea.gn.psi.builtin.*
+import com.google.idea.gn.psi.builtin.BuiltinTargetFunction
+import com.google.idea.gn.psi.builtin.ForwardVariablesFrom
+import com.google.idea.gn.psi.builtin.Import
+import com.google.idea.gn.psi.builtin.Template
 
 object Builtin {
 
-  val DEPS by lazy { FunctionVariable("deps", GnValue.Type.LIST) }
-  val PUBLIC_DEPS by lazy { FunctionVariable("public_deps", GnValue.Type.LIST) }
-  val DATA_DEPS by lazy { FunctionVariable("data_deps", GnValue.Type.LIST) }
-  val INVOKER by lazy { FunctionVariable("invoker", GnValue.Type.SCOPE) }
-
-  val SOURCES by lazy { FunctionVariable("sources", GnValue.Type.LIST) }
-
-
   val FUNCTIONS: Map<String, Function> by lazy {
-    arrayOf(Group(), SourceSet(), Executable(), Import(),
-        Template(), ForwardVariablesFrom()).associateBy { it.name }
+    BuiltinTargetFunction.values().asSequence().plus(
+        sequenceOf(Import(),
+            Template(),
+            ForwardVariablesFrom()
+        ))
+        .associateBy { it.identifierName }
   }
 }

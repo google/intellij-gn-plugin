@@ -8,8 +8,7 @@ import com.google.idea.gn.completion.CompletionIdentifier
 import com.google.idea.gn.completion.FileCompletionProvider
 import com.google.idea.gn.psi.Builtin
 import com.google.idea.gn.psi.GnFile
-import com.google.idea.gn.psi.builtin.Group
-import com.google.idea.gn.psi.builtin.TargetFunction
+import com.google.idea.gn.psi.builtin.BuiltinTargetFunction
 import com.google.idea.gn.util.GnCodeInsightTestCase
 import com.intellij.codeInsight.completion.*
 import com.intellij.codeInsight.lookup.Lookup
@@ -120,9 +119,10 @@ class AutoCompleteTest : GnCodeInsightTestCase() {
     val expect = setOf(
         "global" to CompletionIdentifier.IdentifierType.VARIABLE,
         "local" to CompletionIdentifier.IdentifierType.VARIABLE)
-        .plus(Builtin.FUNCTIONS.values.filter { it !is TargetFunction }
-            .map { it.name to it.identifierType })
-        .plus(Group.VARIABLES.values.map { it.name to it.identifierType })
+        .plus(Builtin.FUNCTIONS.values.filter { it !is BuiltinTargetFunction }
+            .map { it.identifierName to it.identifierType })
+        .plus(
+            BuiltinTargetFunction.GROUP.variables.values.map { it.identifierName to it.identifierType })
 
     assertEquals(expect,
         performIdentifierCompletion().toSet())
@@ -140,7 +140,7 @@ class AutoCompleteTest : GnCodeInsightTestCase() {
     val expect = setOf(
         "global" to CompletionIdentifier.IdentifierType.VARIABLE,
         "my_template" to CompletionIdentifier.IdentifierType.TEMPLATE)
-        .plus(Builtin.FUNCTIONS.values.map { it.name to it.identifierType })
+        .plus(Builtin.FUNCTIONS.values.map { it.identifierName to it.identifierType })
     assertEquals(expect, performIdentifierCompletion().toSet())
   }
 

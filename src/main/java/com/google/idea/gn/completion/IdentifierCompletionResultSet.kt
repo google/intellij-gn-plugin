@@ -10,8 +10,8 @@ class IdentifierCompletionResultSet(private val resultSet: CompletionResultSet) 
   private val added = mutableSetOf<String>()
 
   fun addIdentifier(id: CompletionIdentifier) {
-    if (!added.contains(id.name)) {
-      added.add(id.name)
+    if (!added.contains(id.identifierName)) {
+      added.add(id.identifierName)
       id.addToResult(resultSet)
     }
   }

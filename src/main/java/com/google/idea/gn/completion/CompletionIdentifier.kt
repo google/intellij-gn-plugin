@@ -13,7 +13,7 @@ import com.intellij.ui.LayeredIcon
 import javax.swing.Icon
 
 interface CompletionIdentifier {
-  val name: String
+  val identifierName: String
   val autoSuggestOnInsertion: Boolean get() = false
   val postInsertType: PostInsertType? get() = null
 
@@ -48,7 +48,7 @@ interface CompletionIdentifier {
 
   fun addToResult(resultSet: CompletionResultSet) {
     resultSet.startBatch()
-    val element = LookupElementBuilder.create(name)
+    val element = LookupElementBuilder.create(identifierName)
         .withIcon(identifierType.icon)
         .withTypeText(typeString)
         .withInsertHandler { ctx, _ ->
