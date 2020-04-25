@@ -5,7 +5,9 @@
 package com.google.idea.gn.util
 
 import com.google.idea.gn.psi.GnFile
+import com.google.idea.gn.psi.GnPsiUtil
 import com.intellij.openapi.application.runWriteAction
+import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.project.guessProjectDir
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFile
@@ -15,6 +17,9 @@ import com.intellij.psi.PsiManager
 import com.intellij.testFramework.LightPlatformCodeInsightTestCase
 
 abstract class GnCodeInsightTestCase : LightPlatformCodeInsightTestCase() {
+
+  val LOGGER = Logger.getInstance(GnPsiUtil.javaClass)
+
   override fun getTestDataPath() = "src/test/testData/project/"
 
   val gnFile: GnFile get() = file as GnFile

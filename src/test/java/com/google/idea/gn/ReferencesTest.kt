@@ -101,4 +101,40 @@ class ReferencesTest : GnCodeInsightTestCase() {
   }
 
 
+  fun testNestedTemplateReferences() {
+    copyTestFiles("build/rules.gni")
+    configureFromFileText(GnFile.BUILD_FILE, """
+      template("bar") {
+        group("bar" + target_name) {}
+      } 
+      template("foo") {
+        bar("foo" + target_name) {}
+      } 
+      foo("baz") {}
+      
+      group("x") {
+        deps = [":barfoobaz"]
+      }
+    """.trimIndent())
+
+    if (gnFile.scope.targets?.containsKey("barfoobaz") != true) {
+      error("Failed to find target in ${gnFile.scope.targets}")
+    }
+
+    val label = file.findElementMatching(psiElement(Types.STRING_EXPR).withText("""":barfoobaz""""))
+        ?: error("failed to get label")
+
+    val expect = file.findElementMatching(
+        psiElement(Types.CALL).withText(StandardPatterns.string().startsWith("foo"))) ?: error(
+        "failed to find call site")
+
+    val ref = label.reference?.resolve()
+
+    LOGGER.info("expect: ${expect.text}")
+    LOGGER.info("got: ${ref?.text}")
+
+    assertEquals(expect, ref)
+  }
+
+
 }

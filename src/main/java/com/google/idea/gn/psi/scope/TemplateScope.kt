@@ -7,6 +7,6 @@ import com.google.idea.gn.psi.GnCall
 
 class TemplateScope(parent: Scope?, var call: GnCall) : BlockScope(parent) {
   override val callSite: GnCall?
-    get() = super.callSite ?: call
+    get() = call
 
 }

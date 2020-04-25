@@ -16,7 +16,7 @@ import java.io.StringWriter
 
 object GnPsiUtil {
 
-  val LOGGER = Logger.getInstance(GnPsiUtil.javaClass)
+  private val LOGGER = Logger.getInstance(GnPsiUtil.javaClass)
 
   fun evaluate(expr: GnExpr, scope: Scope): GnValue? {
     LOGGER.debug("evaluating $expr [${expr.text}]")

@@ -19,7 +19,7 @@ import com.intellij.psi.util.parentsOfType
 class TemplateFunction(override val identifierName: String, val declaration: GnCall, val declarationScope: Scope) : Function {
   override fun execute(call: GnCall, targetScope: Scope) {
     val declarationBlock = declaration.block ?: return
-    val executionScope: BlockScope = TemplateScope(declarationScope, call)
+    val executionScope: BlockScope = TemplateScope(declarationScope, targetScope.callSite ?: call)
 
     executionScope.addVariable(
         Variable(Template.TARGET_NAME,
