@@ -18,12 +18,12 @@ object GnPsiUtil {
 
   private val LOGGER = Logger.getInstance(GnPsiUtil.javaClass)
 
-  fun evaluate(expr: GnExpr, scope: Scope): GnValue? {
+  fun evaluate(expr: GnExpr, scope: Scope, visitorDelegate: Visitor.VisitorDelegate? = null): GnValue? {
     LOGGER.debug("evaluating $expr [${expr.text}]")
     val result = when (expr) {
       is GnStringExpr -> evaluateStringExpr(expr, scope)
       is GnLiteralExpr -> evaluateLiteral(expr, scope)
-      is GnPrimaryExpr -> evaluatePrimary(expr, scope)
+      is GnPrimaryExpr -> evaluatePrimary(expr, scope, visitorDelegate)
       is GnUnaryExpr -> evaluateUnaryNot(expr, scope)
       is GnBinaryExpr -> expr.evaluate(scope)
       else -> null
@@ -33,7 +33,9 @@ object GnPsiUtil {
     return result
   }
 
-  private fun evaluatePrimary(expr: GnPrimaryExpr, scope: Scope): GnValue? {
+  private fun evaluatePrimary(expr: GnPrimaryExpr,
+                              scope: Scope,
+                              visitorDelegate: Visitor.VisitorDelegate?): GnValue? {
     expr.id?.let { id ->
       val v = scope.getVariable(id.text) ?: return null
       return v.value
@@ -49,7 +51,7 @@ object GnPsiUtil {
     }
     expr.block?.let { block ->
       val blockScope = BlockScope(scope)
-      block.accept(Visitor(blockScope))
+      block.accept(Visitor(blockScope, visitorDelegate ?: Visitor.VisitorDelegate()))
       return blockScope.intoValue()
     }
     return null

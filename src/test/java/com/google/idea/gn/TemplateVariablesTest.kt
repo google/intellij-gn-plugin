@@ -103,4 +103,19 @@ class TemplateVariablesTest : GnCodeInsightTestCase() {
     assertEquals(setOf("apple"), f.variables.keys)
   }
 
+  fun testForwardIntoBlock() {
+    val f = setupAndGetFooCall("""
+      template("foo") { 
+        foo = {
+          forward_variables_from(invoker, ["apple", "banana"])
+        }
+        forward_variables_from(invoker, ["coconut"])
+      }
+      
+      foo("bar") {}
+    """.trimIndent())
+
+    assertEquals(setOf("apple", "banana", "coconut"), f.variables.keys)
+  }
+
 }

@@ -113,7 +113,9 @@ class TemplateFunction(override val identifierName: String, val declaration: GnC
             variables[second] = TemplateVariable(second)
           }
         })
-        return false
+        // We allow block expressions to be evaluated, since we can have variable
+        // forwarding happening in there.
+        return (expr is GnPrimaryExpr && expr.block != null)
       }
 
       override val observeConditions: Boolean

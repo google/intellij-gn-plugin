@@ -11,7 +11,7 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import com.intellij.psi.tree.IElementType
 
-class Visitor(scope: Scope, private val delegate: VisitorDelegate = object : VisitorDelegate() {}) : GnVisitor() {
+class Visitor(scope: Scope, private val delegate: VisitorDelegate = VisitorDelegate()) : GnVisitor() {
 
   private var stop = false
 
@@ -21,7 +21,7 @@ class Visitor(scope: Scope, private val delegate: VisitorDelegate = object : Vis
     VISIT_BLOCK
   }
 
-  abstract class VisitorDelegate {
+  open class VisitorDelegate {
     open fun afterVisit(element: PsiElement, scope: Scope): Boolean = false
     open fun resolveCall(call: GnCall, function: Function?): CallAction = CallAction.EXECUTE
     open fun shouldExecuteExpr(expr: GnExpr): Boolean = true
@@ -104,7 +104,7 @@ class Visitor(scope: Scope, private val delegate: VisitorDelegate = object : Vis
 
   private fun evalExpr(expr: GnExpr): GnValue? =
       if (delegate.shouldExecuteExpr(expr)) {
-        GnPsiUtil.evaluate(expr, scope)
+        GnPsiUtil.evaluate(expr, scope, delegate)
       } else {
         null
       }
