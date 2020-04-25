@@ -11,7 +11,8 @@ plugins {
 }
 
 def baseVersion = '0.1'
-def gitHash = versionDetails().gitHash
+def gitVersion = versionDetails()
+
 
 apply plugin: 'org.jetbrains.grammarkit'
 
@@ -22,7 +23,12 @@ import org.jetbrains.grammarkit.tasks.GenerateParser
 
 group 'com.google.idea'
 
-version "$baseVersion-SNAPSHOT-$gitHash"
+if(gitVersion.isCleanTag) {
+    version "$baseVersion-SNAPSHOT-${gitVersion.gitHash}"
+} else {
+    version "$baseVersion-DEV"
+}
+
 
 sourceCompatibility = 1.8
 
@@ -92,8 +98,12 @@ sourceSets {
     }
 }
 
+def intellijSinceBuild = '193.5233'
+def intellijUntilBuild = '201.*'
+
 patchPluginXml {
-    untilBuild "201.*"
+    sinceBuild intellijSinceBuild
+    untilBuild intellijUntilBuild
     changeNotes """
     <h2>First release</h2>
     <ul>
@@ -102,4 +112,20 @@ patchPluginXml {
     </ul>
   </change-notes>
     """
+}
+
+task serverPlugins() {
+    dependsOn buildPlugin
+    group "intellij"
+    doLast {
+        new File("$buildDir/distributions", "updatePlugins.xml").text = """<?xml version="1.0" encoding="UTF-8"?>
+<plugins>
+    <plugin id="com.google.idea.gn" url="http://localhost:8080/gn-${version}.zip" version="$version">
+      <name>GN</name>
+      <description>Experimental GN plugin for intellij</description>
+    <idea-version since-build="$intellijSinceBuild" until-build="$intellijUntilBuild" />
+  </plugin>
+</plugins>
+"""
+    }
 }

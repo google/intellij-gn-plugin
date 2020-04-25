@@ -60,7 +60,7 @@ FALSE="false"
 STRING_LITERAL=((\\.)|[^\$\"\n\\])+
 INTEGRAL_LITERAL=[-]?[0-9]+
 HEX_BYTE="0x"[0-9a-fA-F]{2}
-IDENTIFIER=[:letter:][a-zA-Z_0-9]*
+IDENTIFIER=[a-zA-Z_][a-zA-Z_0-9]*
 COMMENT="#".*
 
 %state STRING
