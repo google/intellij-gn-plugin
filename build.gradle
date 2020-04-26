@@ -10,10 +10,6 @@ plugins {
     id 'com.palantir.git-version' version '0.12.3'
 }
 
-def baseVersion = '0.1'
-def gitVersion = versionDetails()
-
-
 apply plugin: 'org.jetbrains.grammarkit'
 
 // import is optional to make task creation easier
@@ -23,12 +19,7 @@ import org.jetbrains.grammarkit.tasks.GenerateParser
 
 group 'com.google.idea'
 
-if(gitVersion.isCleanTag) {
-    version "$baseVersion-SNAPSHOT-${gitVersion.gitHash}"
-} else {
-    version "$baseVersion-DEV"
-}
-
+version gitVersion()
 
 sourceCompatibility = 1.8
 
