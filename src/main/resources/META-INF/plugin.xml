@@ -28,6 +28,8 @@
   <extensions defaultExtensionNs="com.intellij">
     <fileType name="GN" implementationClass="com.google.idea.gn.GnFileType" language="gn"
         extensions="gn;gni" fieldName="INSTANCE"/>
+    <internalFileTemplate name="Gn File"/>
+
     <lang.parserDefinition language="gn"
         implementationClass="com.google.idea.gn.GnParserDefinition"/>
     <lang.syntaxHighlighterFactory language="gn"
@@ -52,4 +54,13 @@
 
     <lang.commenter language="gn" implementationClass="com.google.idea.gn.GnCommenter"/>
   </extensions>
+
+  <actions>
+    <action class="com.google.idea.gn.actions.NewBuildFileAction" id="Gn.NewBuildFile"
+        text="Build File" description="Create new BUILD.gn file">
+      <add-to-group group-id="NewGroup" anchor="after"
+          relative-to-action="FileTemplateSeparatorGroup"/>
+    </action>
+
+  </actions>
 </idea-plugin>

@@ -47,6 +47,7 @@ class GnFile(viewProvider: FileViewProvider) : PsiFileBase(viewProvider, GnLangu
   companion object {
     const val BUILD_FILE = "BUILD.gn"
     const val GNI = "gni"
+    const val TEMPLATE_NAME = "Gn File"
     val CACHE_KEY = Key<CachedValue<Scope>>("gn-file-scope")
   }
 }
