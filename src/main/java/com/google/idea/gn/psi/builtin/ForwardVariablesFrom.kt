@@ -4,14 +4,39 @@
 package com.google.idea.gn.psi.builtin
 
 import com.google.idea.gn.completion.CompletionIdentifier
+import com.google.idea.gn.psi.*
 import com.google.idea.gn.psi.Function
-import com.google.idea.gn.psi.GnCall
 import com.google.idea.gn.psi.scope.Scope
 
 class ForwardVariablesFrom : Function {
 
-  override fun execute(call: GnCall, targetScope: Scope) {
-    // TODO implement variable forwarding
+  override fun execute(call: GnCall, targetScope: Scope): GnValue? {
+    val exprList = call.exprList.exprList
+    if (exprList.size < 2) {
+      return null
+    }
+    val src = GnPsiUtil.evaluate(exprList[0], targetScope)?.scope ?: return null
+    val fwdValue = GnPsiUtil.evaluate(exprList[1], targetScope) ?: return null
+    val doForward = when {
+      fwdValue.string == "*" -> null
+      fwdValue.list != null -> fwdValue.list!!.mapNotNull { it.string }.toSet()
+      else -> return null
+    }
+
+    val dontForward = if (exprList.size >= 3) {
+      GnPsiUtil.evaluate(exprList[2], targetScope)?.list?.mapNotNull { it.string }?.toSet()
+          ?: return null
+    } else {
+      emptySet()
+    }
+
+    for (v in src) {
+      if ((doForward == null || doForward.contains(v.key)) && !dontForward.contains(v.key)) {
+        targetScope.addVariable(Variable(v.key, v.value))
+      }
+    }
+
+    return null
   }
 
   override val isBuiltin: Boolean

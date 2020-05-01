@@ -3,6 +3,7 @@
 // license that can be found in the LICENSE file.
 package com.google.idea.gn.psi
 
+import com.google.idea.gn.GnKeys
 import com.google.idea.gn.GnLabel
 import com.google.idea.gn.psi.scope.BlockScope
 import com.google.idea.gn.psi.scope.Scope
@@ -53,6 +54,12 @@ object GnPsiUtil {
       val blockScope = BlockScope(scope)
       block.accept(Visitor(blockScope, visitorDelegate ?: Visitor.VisitorDelegate()))
       return blockScope.intoValue()
+    }
+    expr.call?.let { call ->
+      return scope.getFunction(call.id.text)?.let { func ->
+        call.putUserData(GnKeys.CALL_RESOLVED_FUNCTION, func)
+        func.execute(call, scope)
+      }
     }
     return null
   }

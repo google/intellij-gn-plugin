@@ -37,6 +37,10 @@ abstract class Scope protected constructor(val parent: Scope?) {
     _variables!![v.identifierName] = v
   }
 
+  open fun deleteVariable(id: String) {
+    _variables?.remove(id)
+  }
+
   open fun getVariable(name: String): Variable? {
     return _variables?.get(name) ?: parent?.getVariable(name)
   }

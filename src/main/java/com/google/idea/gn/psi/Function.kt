@@ -8,7 +8,7 @@ import com.google.idea.gn.psi.scope.Scope
 
 interface Function : CompletionIdentifier {
   fun execute(call: GnCall,
-              targetScope: Scope)
+              targetScope: Scope): GnValue?
 
   val isBuiltin: Boolean
   val variables: Map<String, FunctionVariable> get() = emptyMap()

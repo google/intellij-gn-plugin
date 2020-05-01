@@ -17,8 +17,8 @@ import com.intellij.psi.PsiElementVisitor
 import com.intellij.psi.util.parentsOfType
 
 class TemplateFunction(override val identifierName: String, val declaration: GnCall, val declarationScope: Scope) : Function {
-  override fun execute(call: GnCall, targetScope: Scope) {
-    val declarationBlock = declaration.block ?: return
+  override fun execute(call: GnCall, targetScope: Scope): GnValue? {
+    val declarationBlock = declaration.block ?: return null
     val executionScope: BlockScope = TemplateScope(declarationScope, targetScope.callSite ?: call)
 
     executionScope.addVariable(
@@ -35,6 +35,7 @@ class TemplateFunction(override val identifierName: String, val declaration: GnC
     }
 
     Visitor(BlockScope(executionScope)).visitBlock(declarationBlock)
+    return null
   }
 
   override val variables: Map<String, FunctionVariable> by lazy {

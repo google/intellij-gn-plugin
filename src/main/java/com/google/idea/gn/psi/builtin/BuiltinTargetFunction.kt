@@ -76,18 +76,27 @@ enum class BuiltinTargetFunction(override val identifierName: String,
           ALL_DEPENDENT_CONFIGS, PUBLIC_CONFIGS, CHECK_INCLUDES, CONFIGS, DATA, FRIEND, INPUTS,
           METADATA, OUTPUT_NAME, OUTPUT_EXTENSION, PUBLIC, SOURCES, TESTONLY, VISIBILITY,
           ALIASED_DEPS, CRATE_ROOT, CRATE_NAME)),
-  TARGET("target", emptySequence())
+  TARGET("target", emptySequence()),
+
+  // NOTE: config is not really a target function, we model is as such while we don't differentiate
+  // between configs and targets.
+  CONFIG("config",
+      sequenceOf(CFLAGS, CFLAGS_C, CFLAGS_CC, CFLAGS_OBJC, CFLAGS_OBJCC, ASMFLAGS, DEFINES,
+          INCLUDE_DIRS, INPUTS, LDFLAGS, LIB_DIRS, LIBS, PRECOMPILED_HEADER, PRECOMPILED_SOURCE,
+          RUSTFLAGS, RUSTENV, CONFIGS, ALL_DEPENDENT_CONFIGS, PUBLIC_CONFIGS
+      ))
   ;
 
   override val variables: Map<String, FunctionVariable> = varList.associateBy { it.identifierName }
 
-  override fun execute(call: GnCall, targetScope: Scope) {
-    val targetName = GnPsiUtil.evaluateFirstToString(call.exprList, targetScope) ?: return
+  override fun execute(call: GnCall, targetScope: Scope): GnValue? {
+    val targetName = GnPsiUtil.evaluateFirstToString(call.exprList, targetScope) ?: return null
     var callSite = targetScope.callSite
     if (callSite == null) {
       callSite = call
     }
     targetScope.addTarget(Target(targetName, callSite))
+    return null
   }
 
   override val isBuiltin: Boolean

@@ -3,19 +3,34 @@
 // license that can be found in the LICENSE file.
 package com.google.idea.gn.psi
 
-import com.google.idea.gn.psi.builtin.BuiltinTargetFunction
-import com.google.idea.gn.psi.builtin.ForwardVariablesFrom
-import com.google.idea.gn.psi.builtin.Import
-import com.google.idea.gn.psi.builtin.Template
+import com.google.idea.gn.psi.builtin.*
 
 object Builtin {
 
   val FUNCTIONS: Map<String, Function> by lazy {
-    BuiltinTargetFunction.values().asSequence().plus(
-        sequenceOf(Import(),
-            Template(),
-            ForwardVariablesFrom()
-        ))
+    sequenceOf(
+        DeclareArgs(),
+        Defined(),
+        FilterExclude(),
+        FilterInclude(),
+        Foreach(),
+        ForwardVariablesFrom(),
+        GetLabelInfo(),
+        GetPathInfo(),
+        GetTargetOutputs(),
+        GetEnv(),
+        Import(),
+        ProcessFileTemplate(),
+        ReadFile(),
+        RebasePath(),
+        SetDefaultToolchain(),
+        SplitList(),
+        StringJoin(),
+        StringReplace(),
+        StringSplit(),
+        Template()
+    ).plus(BuiltinTargetFunction.values().asSequence())
+        .plus(NoOpFunctions.values().asSequence())
         .associateBy { it.identifierName }
   }
 }

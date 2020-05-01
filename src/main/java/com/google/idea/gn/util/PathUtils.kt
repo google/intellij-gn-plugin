@@ -26,4 +26,4 @@ fun getPathLabel(file: VirtualFile, base: VirtualFile, absolute: Boolean = true)
 fun getPathLabel(file: VirtualFile, project: Project): String? = project.guessProjectDir()
     ?.let { getPathLabel(file, it) }
 
-fun getPathLabel(file: PsiFile): String? = getPathLabel(file.virtualFile, file.project)
+fun getPathLabel(file: PsiFile): String? = getPathLabel(file.virtualFile.parent, file.project)

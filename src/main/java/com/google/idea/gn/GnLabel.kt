@@ -3,7 +3,9 @@
 // license that can be found in the LICENSE file.
 package com.google.idea.gn
 
+import com.google.idea.gn.util.getPathLabel
 import com.intellij.openapi.util.text.StringUtil
+import com.intellij.psi.PsiFile
 import java.io.StringWriter
 import java.util.regex.Pattern
 
@@ -14,12 +16,34 @@ class GnLabel private constructor() {
       parts[parts.size - 1]
     } else targetField
 
-  override fun toString(): String {
-    val writer = StringWriter()
+  private fun writeDir(writer: StringWriter) {
     if (isAbsolute) {
       writer.write("//")
     }
     writer.write(java.lang.String.join("/", *parts))
+  }
+
+  fun toFullyQualified(): GnLabel {
+    val ret = GnLabel()
+    ret.isAbsolute = isAbsolute
+    ret.parts = parts
+    ret.targetField = target
+    ret.toolchain = toolchain
+    return ret
+  }
+
+  fun dropToolChain(): GnLabel {
+    val ret = GnLabel()
+    ret.isAbsolute = isAbsolute
+    ret.parts = parts
+    ret.targetField = targetField
+    ret.toolchain = null
+    return ret
+  }
+
+  override fun toString(): String {
+    val writer = StringWriter()
+    writeDir(writer)
     targetField?.let {
       if (it.isNotEmpty()) {
         writer.write(":")
@@ -44,9 +68,28 @@ class GnLabel private constructor() {
   var toolchain: String? = null
     private set
 
+  val dirString: String
+    get() {
+      val writer = StringWriter()
+      writeDir(writer)
+      return writer.toString()
+    }
+
+  fun toAbsolute(file: PsiFile): GnLabel {
+    if (isAbsolute) {
+      return this
+    }
+    val ret = parse(getPathLabel(file)) ?: error("Can't parse path label")
+    ret.isAbsolute = true
+    ret.toolchain = toolchain
+    ret.targetField = target
+    ret.parts = ret.parts.plus(parts)
+    return ret
+  }
+
   companion object {
     private val PATH_PATTERN = Pattern.compile(
-        """(//)?([a-zA-Z0-9$ \-_./]*)(:[a-zA-Z0-9_\-$.]*)?(\([a-zA-Z0-9_\-$.]*\))?""")
+        """(//)?([a-zA-Z0-9$ \-_./]*)(:[a-zA-Z0-9_\-$.]*)?(\([a-zA-Z0-9_\-$./:]*\))?""")
 
     @kotlin.jvm.JvmStatic
     fun parse(path: String?): GnLabel? {

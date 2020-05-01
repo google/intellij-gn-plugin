@@ -4,16 +4,15 @@
 package com.google.idea.gn.psi.builtin
 
 import com.google.idea.gn.completion.CompletionIdentifier
+import com.google.idea.gn.psi.*
 import com.google.idea.gn.psi.Function
-import com.google.idea.gn.psi.GnCall
-import com.google.idea.gn.psi.GnPsiUtil
-import com.google.idea.gn.psi.TemplateFunction
 import com.google.idea.gn.psi.scope.Scope
 
 class Template : Function {
-  override fun execute(call: GnCall, targetScope: Scope) {
-    val name = GnPsiUtil.evaluateFirstToString(call.exprList, targetScope) ?: return
+  override fun execute(call: GnCall, targetScope: Scope): GnValue? {
+    val name = GnPsiUtil.evaluateFirstToString(call.exprList, targetScope) ?: return null
     targetScope.installFunction(TemplateFunction(name, call, targetScope))
+    return null
   }
 
   override val identifierType: CompletionIdentifier.IdentifierType

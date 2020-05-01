@@ -6,21 +6,21 @@ package com.google.idea.gn.psi.builtin
 import com.google.idea.gn.GnLabel
 import com.google.idea.gn.GnLanguage
 import com.google.idea.gn.completion.CompletionIdentifier
+import com.google.idea.gn.psi.*
 import com.google.idea.gn.psi.Function
-import com.google.idea.gn.psi.GnCall
-import com.google.idea.gn.psi.GnPsiUtil
-import com.google.idea.gn.psi.Visitor
 import com.google.idea.gn.psi.scope.Scope
 
 class Import : Function {
-  override fun execute(call: GnCall, targetScope: Scope) {
-    val name = GnPsiUtil.evaluateFirstToString(call.exprList, targetScope) ?: return
-    val label: GnLabel = GnLabel.parse(name) ?: return
+  override fun execute(call: GnCall, targetScope: Scope): GnValue? {
+    val name = GnPsiUtil.evaluateFirstToString(call.exprList, targetScope) ?: return null
+    val label: GnLabel = GnLabel.parse(name) ?: return null
     val file = GnPsiUtil.findPsiFile(call.containingFile, label)
     if (file == null || GnLanguage != file.language) {
-      return
+      return null
     }
     file.accept(Visitor(targetScope))
+
+    return null
   }
 
   override val identifierType: CompletionIdentifier.IdentifierType
