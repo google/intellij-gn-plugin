@@ -3,16 +3,17 @@
 // license that can be found in the LICENSE file.
 package com.google.idea.gn
 
-import com.google.idea.gn.psi.Builtin
-import com.google.idea.gn.psi.GnCall
-import com.google.idea.gn.psi.GnId
+import com.google.idea.gn.psi.*
 import com.google.idea.gn.psi.builtin.BuiltinTargetFunction
 import com.google.idea.gn.psi.reference.GnCallIdentifierReference
+import com.google.idea.gn.psi.scope.FileScope
 import com.intellij.lang.annotation.AnnotationHolder
 import com.intellij.lang.annotation.Annotator
 import com.intellij.psi.PsiElement
 
 class GnAnnotator : Annotator {
+
+  var file: GnFile? = null
 
   private fun getCallIdentifierColor(identifier: GnId): GnColors? {
     (identifier.reference as? GnCallIdentifierReference)?.let {
@@ -42,9 +43,23 @@ class GnAnnotator : Annotator {
     }
   }
 
+  private fun prepareFile(newFile: GnFile) {
+    val visitor = Visitor(FileScope(), object : Visitor.VisitorDelegate() {
+      override val observeConditions: Boolean
+        get() = false
+      override val callTemplates: Boolean
+        get() = true
+    })
+    newFile.accept(visitor)
+    file = newFile
+  }
+
   override fun annotate(element: PsiElement, holder: AnnotationHolder) {
-    if (element is GnId) {
-      annotateIdentifier(element, holder)
+    if (holder.currentAnnotationSession.file != file) {
+      (holder.currentAnnotationSession.file as? GnFile)?.let { prepareFile(it) }
+    }
+    when (element) {
+      is GnId -> annotateIdentifier(element, holder)
     }
   }
 }

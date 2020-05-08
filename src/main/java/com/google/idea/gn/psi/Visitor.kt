@@ -4,6 +4,7 @@
 package com.google.idea.gn.psi
 
 import com.google.idea.gn.GnKeys
+import com.google.idea.gn.psi.builtin.Template
 import com.google.idea.gn.psi.scope.BlockScope
 import com.google.idea.gn.psi.scope.Scope
 import com.intellij.openapi.progress.ProgressManager
@@ -18,7 +19,7 @@ class Visitor(scope: Scope, private val delegate: VisitorDelegate = VisitorDeleg
   enum class CallAction {
     SKIP,
     EXECUTE,
-    VISIT_BLOCK
+    VISIT_BLOCK,
   }
 
   open class VisitorDelegate {
@@ -26,6 +27,7 @@ class Visitor(scope: Scope, private val delegate: VisitorDelegate = VisitorDeleg
     open fun resolveCall(call: GnCall, function: Function?): CallAction = CallAction.EXECUTE
     open fun shouldExecuteExpr(expr: GnExpr): Boolean = true
     open val observeConditions: Boolean get() = true
+    open val callTemplates: Boolean get() = false
   }
 
   private fun interceptAfter(element: PsiElement) {
@@ -76,7 +78,14 @@ class Visitor(scope: Scope, private val delegate: VisitorDelegate = VisitorDeleg
     call.putUserData(GnKeys.CALL_RESOLVED_FUNCTION, f)
     when (delegate.resolveCall(call, f)) {
       CallAction.SKIP -> Unit
-      CallAction.EXECUTE -> f?.execute(call, scope)
+      CallAction.EXECUTE -> {
+        f?.execute(call, scope)
+        if (delegate.callTemplates && f is Template) {
+          call.getUserData(GnKeys.TEMPLATE_INSTALLED_FUNCTION)?.let {
+            it.declaration.block?.accept(Visitor(it.buildDummyInvokeScope(), delegate))
+          }
+        }
+      }
       CallAction.VISIT_BLOCK -> call.block?.let { visitBlock(it, pushScope = true) }
     }
     interceptAfter(call)

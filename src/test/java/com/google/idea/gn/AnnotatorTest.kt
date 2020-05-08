@@ -70,4 +70,20 @@ class AnnotatorTest : GnCodeInsightTestCase() {
     ), highlight.map { HighlightChecker(it) })
   }
 
+  fun testAnnotateInsideTemplates() {
+    configureFromFileText(GnFile.BUILD_FILE, """
+    template("foo") {
+    }
+    
+    template("bar") {
+      foo("baz") {
+      
+      }
+    }
+    """.trimIndent())
+    val highlight = CodeInsightTestFixtureImpl.instantiateAndRun(file, editor, IntArray(0), false)
+        .find { it.text == "foo" } ?: error("Failed to get highlight target")
+    assertEquals(GnColors.TEMPLATE.textAttributesKey, HighlightChecker(highlight).highlightKey)
+  }
+
 }

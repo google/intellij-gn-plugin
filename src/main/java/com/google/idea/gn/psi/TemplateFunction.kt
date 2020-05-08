@@ -14,10 +14,18 @@ import com.google.idea.gn.psi.scope.Scope
 import com.google.idea.gn.psi.scope.TemplateScope
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiElementVisitor
+import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.psi.util.parentsOfType
 
 class TemplateFunction(override val identifierName: String, val declaration: GnCall, val declarationScope: Scope) : Function {
   override fun execute(call: GnCall, targetScope: Scope): GnValue? {
+
+    // Prevent recurring forever.
+    if (PsiTreeUtil.isAncestor(declaration, call, false)) {
+      return null
+    }
+
+
     val declarationBlock = declaration.block ?: return null
     val executionScope: BlockScope = TemplateScope(declarationScope, targetScope.callSite ?: call)
 
@@ -36,6 +44,14 @@ class TemplateFunction(override val identifierName: String, val declaration: GnC
 
     Visitor(BlockScope(executionScope)).visitBlock(declarationBlock)
     return null
+  }
+
+  fun buildDummyInvokeScope(): Scope {
+    val scope = BlockScope(declarationScope)
+    scope.addVariable(Variable(Template.TARGET_NAME, GnValue("dummy")))
+    // TODO allow any variables to come from invoker.
+    scope.addVariable(Variable(BuiltinVariable.INVOKER.identifierName))
+    return scope
   }
 
   override val variables: Map<String, FunctionVariable> by lazy {

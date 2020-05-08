@@ -3,6 +3,7 @@
 // license that can be found in the LICENSE file.
 package com.google.idea.gn.psi.builtin
 
+import com.google.idea.gn.GnKeys
 import com.google.idea.gn.completion.CompletionIdentifier
 import com.google.idea.gn.psi.*
 import com.google.idea.gn.psi.Function
@@ -11,7 +12,9 @@ import com.google.idea.gn.psi.scope.Scope
 class Template : Function {
   override fun execute(call: GnCall, targetScope: Scope): GnValue? {
     val name = GnPsiUtil.evaluateFirstToString(call.exprList, targetScope) ?: return null
-    targetScope.installFunction(TemplateFunction(name, call, targetScope))
+    val func = TemplateFunction(name, call, targetScope)
+    targetScope.installFunction(func)
+    call.putUserData(GnKeys.TEMPLATE_INSTALLED_FUNCTION, func)
     return null
   }
 
