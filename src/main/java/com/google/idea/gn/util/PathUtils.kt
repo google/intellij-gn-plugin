@@ -4,8 +4,8 @@
 
 package com.google.idea.gn.util
 
+import com.google.idea.gn.config.gnRoot
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.project.guessProjectDir
 import com.intellij.openapi.vfs.VfsUtilCore
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiFile
@@ -23,7 +23,7 @@ fun getPathLabel(file: VirtualFile, base: VirtualFile, absolute: Boolean = true)
     }
 
 
-fun getPathLabel(file: VirtualFile, project: Project): String? = project.guessProjectDir()
+fun getPathLabel(file: VirtualFile, project: Project): String? = project.gnRoot
     ?.let { getPathLabel(file, it) }
 
 fun getPathLabel(file: PsiFile): String? = getPathLabel(file.virtualFile.parent, file.project)

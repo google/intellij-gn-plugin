@@ -5,10 +5,10 @@ package com.google.idea.gn.psi
 
 import com.google.idea.gn.GnKeys
 import com.google.idea.gn.GnLabel
+import com.google.idea.gn.config.gnRoot
 import com.google.idea.gn.psi.scope.BlockScope
 import com.google.idea.gn.psi.scope.Scope
 import com.intellij.openapi.diagnostic.Logger
-import com.intellij.openapi.project.guessProjectDir
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiFile
@@ -170,7 +170,7 @@ object GnPsiUtil {
   fun findVirtualFile(labelLocation: PsiFile,
                       label: GnLabel): VirtualFile? {
     return if (label.isAbsolute) {
-      labelLocation.project.guessProjectDir()
+      labelLocation.project.gnRoot
     } else {
       labelLocation.originalFile.virtualFile.parent
     }?.let { VfsUtil.findRelativeFile(it, *label.parts) }

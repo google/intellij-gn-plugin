@@ -4,11 +4,11 @@
 
 package com.google.idea.gn.util
 
+import com.google.idea.gn.config.gnRoot
 import com.google.idea.gn.psi.GnFile
 import com.google.idea.gn.psi.GnPsiUtil
 import com.intellij.openapi.application.runWriteAction
 import com.intellij.openapi.diagnostic.Logger
-import com.intellij.openapi.project.guessProjectDir
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.VirtualFileVisitor
@@ -25,14 +25,14 @@ abstract class GnCodeInsightTestCase : LightPlatformCodeInsightTestCase() {
   val gnFile: GnFile get() = file as GnFile
 
   fun getProjectFile(path: String): VirtualFile? =
-      project.guessProjectDir()!!.findFileByRelativePath(path)
+      project.gnRoot!!.findFileByRelativePath(path)
 
   fun getProjectPsiFile(path: String): PsiFile? = getProjectFile(
       path)?.let { PsiManager.getInstance(project).findFile(it) }
 
   fun copyTestFilesByVirtualFile(filter: (VirtualFile) -> Boolean) {
     runWriteAction {
-      val projDir = project.guessProjectDir()!!
+      val projDir = project.gnRoot!!
       VfsUtil.copyDirectory(this, getVirtualFile(""), projDir, filter)
       // Delete any empty directories.
       VfsUtil.visitChildrenRecursively(projDir, object : VirtualFileVisitor<Unit>() {

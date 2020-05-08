@@ -53,6 +53,18 @@
     <documentationProvider implementation="com.google.idea.gn.GnDocumentationProvider"/>
 
     <lang.commenter language="gn" implementationClass="com.google.idea.gn.GnCommenter"/>
+
+    <!-- configs -->
+
+    <projectService
+        serviceInterface="com.google.idea.gn.config.GnSettingsService"
+        serviceImplementation="com.google.idea.gn.config.GnSettingsServiceImpl"/>
+
+    <projectConfigurable instance="com.google.idea.gn.config.GnProjectConfigurable"
+        displayName="Gn"
+        groupId="language"
+        id="language.gn"/>
+
   </extensions>
 
   <actions>

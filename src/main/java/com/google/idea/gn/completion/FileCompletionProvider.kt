@@ -7,6 +7,7 @@ package com.google.idea.gn.completion
 import com.google.idea.gn.GnCompletionContributor
 import com.google.idea.gn.GnKeys
 import com.google.idea.gn.GnLabel
+import com.google.idea.gn.config.gnRoot
 import com.google.idea.gn.psi.GnFile
 import com.google.idea.gn.psi.Target
 import com.google.idea.gn.util.getPathLabel
@@ -17,7 +18,6 @@ import com.intellij.codeInsight.completion.impl.CamelHumpMatcher
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.progress.ProgressManager
-import com.intellij.openapi.project.guessProjectDir
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VfsUtilCore
 import com.intellij.openapi.vfs.VirtualFile
@@ -51,7 +51,7 @@ class FileCompletionProvider @JvmOverloads constructor(private val mFileMatcher:
     if (path != null) {
       absolute = path.isAbsolute
       base = if (absolute) {
-        project.guessProjectDir()
+        project.gnRoot
       } else {
         parameters.originalFile.containingDirectory.virtualFile
       }
@@ -64,7 +64,7 @@ class FileCompletionProvider @JvmOverloads constructor(private val mFileMatcher:
       }
     } else {
       if (text.startsWith("//")) {
-        dir = project.guessProjectDir()
+        dir = project.gnRoot
         base = dir
         absolute = true
       } else {
