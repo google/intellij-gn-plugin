@@ -144,9 +144,11 @@ class Visitor(scope: Scope, private val delegate: VisitorDelegate = VisitorDeleg
     if (stop) {
       return
     }
-    val type = AssignType.fromNode(assignment.assignOp.firstChild.node.elementType) ?: return
+    val assignOp = assignment.assignOp ?: return
+    val expr = assignment.expr ?: return
+    val type = AssignType.fromNode(assignOp.firstChild.node.elementType) ?: return
     val target = createAssignmentTarget(assignment.lvalue, type) ?: return
-    val result = evalExpr(assignment.expr)
+    val result = evalExpr(expr)
 
     target.variableValue = when (type) {
       AssignType.EQUAL -> result

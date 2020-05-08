@@ -57,12 +57,14 @@
  */
 
 file ::= statement-list
-private statement-recover ::= !(newline | CBRACKET | CPAREN | CBRACE)
+private statement-recover ::= !(newline | CBRACKET | CPAREN | CBRACE | COMMA)
 statement ::= call | condition | assignment {
   pin(".*")=1
 }
 lvalue ::= array-access | scope-access | id
-assignment ::= lvalue assign-op expr
+assignment ::= lvalue assign-op expr {
+  pin="lvalue"
+}
 call ::= id OPAREN expr-list CPAREN [block]
 
 condition ::= IF OPAREN expr CPAREN block [else-condition] {
