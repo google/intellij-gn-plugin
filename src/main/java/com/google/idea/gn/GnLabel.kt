@@ -75,11 +75,11 @@ class GnLabel private constructor() {
       return writer.toString()
     }
 
-  fun toAbsolute(file: PsiFile): GnLabel {
+  fun toAbsolute(file: PsiFile): GnLabel? {
     if (isAbsolute) {
       return this
     }
-    val ret = parse(getPathLabel(file)) ?: error("Can't parse path label")
+    val ret = parse(getPathLabel(file)) ?: return null
     ret.isAbsolute = true
     ret.toolchain = toolchain
     ret.targetField = target
