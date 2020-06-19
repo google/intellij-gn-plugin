@@ -28,7 +28,8 @@ object Builtin {
         StringJoin(),
         StringReplace(),
         StringSplit(),
-        Template()
+        Template(),
+        com.google.idea.gn.psi.builtin.Target()
     ).plus(BuiltinTargetFunction.values().asSequence())
         .plus(NoOpFunctions.values().asSequence())
         .associateBy { it.identifierName }

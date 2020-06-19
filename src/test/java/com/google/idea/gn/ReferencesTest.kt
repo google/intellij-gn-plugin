@@ -125,7 +125,42 @@ class ReferencesTest : GnCodeInsightTestCase() {
         ?: error("failed to get label")
 
     val expect = file.findElementMatching(
-        psiElement(Types.CALL).withText(StandardPatterns.string().startsWith("foo"))) ?: error(
+        psiElement(Types.CALL).withText(
+            StandardPatterns.string().startsWith("foo"))) ?: error(
+        "failed to find call site")
+
+    val ref = label.reference?.resolve()
+
+    LOGGER.info("expect: ${expect.text}")
+    LOGGER.info("got: ${ref?.text}")
+
+    assertEquals(expect, ref)
+  }
+
+  fun testReferenceThroughTargetTemplate() {
+    configureFromFileText(GnFile.BUILD_FILE, """
+      template("bar") {
+        target("group", target_name) {}
+      }
+       
+      bar("baz") {}
+      
+      group("x") {
+        deps = [":baz"]
+      }
+    """.trimIndent())
+
+    if (gnFile.scope.targets?.containsKey("baz") != true) {
+      error("Failed to find baz in ${gnFile.scope.targets}")
+    }
+
+    val label = file.findElementMatching(
+        psiElement(Types.STRING_EXPR).withText("""":baz""""))
+        ?: error("failed to get label")
+
+    val expect = file.findElementMatching(
+        psiElement(Types.CALL).withText(
+            StandardPatterns.string().startsWith("bar"))) ?: error(
         "failed to find call site")
 
     val ref = label.reference?.resolve()

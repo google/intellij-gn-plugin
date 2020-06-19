@@ -76,7 +76,6 @@ enum class BuiltinTargetFunction(override val identifierName: String,
           ALL_DEPENDENT_CONFIGS, PUBLIC_CONFIGS, CHECK_INCLUDES, CONFIGS, DATA, FRIEND, INPUTS,
           METADATA, OUTPUT_NAME, OUTPUT_EXTENSION, PUBLIC, SOURCES, TESTONLY, VISIBILITY,
           ALIASED_DEPS, CRATE_ROOT, CRATE_NAME)),
-  TARGET("target", emptySequence()),
 
   // NOTE: config is not really a target function, we model is as such while we don't differentiate
   // between configs and targets.
