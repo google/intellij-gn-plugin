@@ -97,14 +97,12 @@ patchPluginXml {
     untilBuild intellijUntilBuild
     changeNotes """
     <h2>First release</h2>
-    <ul>
-        <li>Basic syntax highlighting</li>
-        <li>Code navigation</li>
-    </ul>
   </change-notes>
     """
 }
 
+// Helper build task to create a local updatePlugins.xml file to serve updates
+// locally.
 task serverPlugins() {
     dependsOn buildPlugin
     group "intellij"

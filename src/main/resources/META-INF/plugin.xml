@@ -14,14 +14,16 @@
         <a href="https://gn.googlesource.com/gn">GN</a> Plugin for IntelliJ.<br>
     <h2> Features </h2>
     <ul>
-    <li> Syntax and Semantic Highlighting </li>
-    <li> Error highlighting </li>
+      <li>Basic syntax highlighting</li>
+      <li>Very basic target parsing</li>
+      <li>Click-through navigation for resolved label references</li>
+      <li>Very basic formatting</li>
     </ul>
+    <p>Note that this is a GN language plugin, it helps you author and edit .gn
+    files; it does not support importing a project model from a GN-based
+    project.</p>
     ]]></description>
 
-
-  <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
-       on how to target different products -->
   <depends>com.intellij.modules.lang</depends>
 
 
