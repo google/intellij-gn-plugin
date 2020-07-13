@@ -6,7 +6,7 @@
   <id>com.google.idea.gn</id>
   <name>GN</name>
   <vendor
-      url="https://fuchsia.googlesource.com/intellij-language-gn/">The Fuchsia Authors
+      url="https://github.com/google/intellij-gn-plugin">The Fuchsia Authors
   </vendor>
   <category>Languages</category>
 

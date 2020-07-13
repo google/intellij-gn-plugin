@@ -101,6 +101,10 @@ patchPluginXml {
     """
 }
 
+publishPlugin {
+    token = System.getenv("ORG_GRADLE_PROJECT_intellijPublishToken")
+}
+
 // Helper build task to create a local updatePlugins.xml file to serve updates
 // locally.
 task serverPlugins() {
