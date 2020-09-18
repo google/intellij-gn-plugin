@@ -8,6 +8,8 @@ import com.google.idea.gn.psi.GnFile
 import com.intellij.ide.actions.CreateFileFromTemplateAction
 import com.intellij.ide.fileTemplates.FileTemplateManager
 import com.intellij.openapi.actionSystem.*
+import com.intellij.util.containers.getIfSingle
+import com.intellij.util.containers.stream
 
 
 class NewBuildFileAction : AnAction(CAPTION, "", GnIcons.FILE) {
@@ -19,7 +21,7 @@ class NewBuildFileAction : AnAction(CAPTION, "", GnIcons.FILE) {
   private fun isAvailable(dataContext: DataContext): Boolean {
     // Only show action if a BUILD.gn file does not exist.
     val view = LangDataKeys.IDE_VIEW.getData(dataContext) ?: return false
-    val dir = view.orChooseDirectory ?: return false
+    val dir = view.directories.stream().getIfSingle() ?: return false
     return dir.virtualFile.findChild(GnFile.BUILD_FILE) == null
   }
 
@@ -34,7 +36,7 @@ class NewBuildFileAction : AnAction(CAPTION, "", GnIcons.FILE) {
     val dataContext = e.dataContext
     val view = LangDataKeys.IDE_VIEW.getData(dataContext) ?: return
     val project = CommonDataKeys.PROJECT.getData(dataContext) ?: return
-    val dir = view.orChooseDirectory ?: return
+    val dir = view.directories.stream().getIfSingle() ?: return
     val template = FileTemplateManager.getInstance(project)
         .getInternalTemplate(GnFile.TEMPLATE_NAME)
 
