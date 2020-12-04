@@ -90,7 +90,7 @@ sourceSets {
 }
 
 def intellijSinceBuild = '193.5233'
-def intellijUntilBuild = '202.*'
+def intellijUntilBuild = '203.*'
 
 patchPluginXml {
     sinceBuild intellijSinceBuild
