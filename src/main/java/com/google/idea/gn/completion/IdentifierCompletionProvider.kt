@@ -16,7 +16,7 @@ import com.intellij.codeInsight.completion.CompletionProvider
 import com.intellij.codeInsight.completion.CompletionResultSet
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.psi.PsiElement
-import com.intellij.psi.util.parentOfType
+import com.intellij.psi.util.parentOfTypes
 import com.intellij.psi.util.parents
 import com.intellij.util.ProcessingContext
 
@@ -30,7 +30,7 @@ class IdentifierCompletionProvider : CompletionProvider<CompletionParameters>() 
       return
     }
 
-    val stopAt = position.parentOfType(GnStatement::class,
+    val stopAt = position.parentOfTypes(GnStatement::class,
         GnBlock::class, GnFile::class) ?: file
 
 
@@ -41,7 +41,7 @@ class IdentifierCompletionProvider : CompletionProvider<CompletionParameters>() 
           when {
             // Template and import calls must be executed so they show up in the scope.
             function is Template || function is Import -> Visitor.CallAction.EXECUTE
-            position.parents().contains(call) -> Visitor.CallAction.VISIT_BLOCK
+            position.parents(true).contains(call) -> Visitor.CallAction.VISIT_BLOCK
             else -> Visitor.CallAction.SKIP
           }
 
@@ -58,7 +58,7 @@ class IdentifierCompletionProvider : CompletionProvider<CompletionParameters>() 
 
     val scope = capturingVisitor.finalScope ?: file.scope
 
-    val inFunction = position.parentOfType(GnCall::class)
+    val inFunction = position.parentOfTypes(GnCall::class)
         ?.getUserData(GnKeys.CALL_RESOLVED_FUNCTION)
 
 

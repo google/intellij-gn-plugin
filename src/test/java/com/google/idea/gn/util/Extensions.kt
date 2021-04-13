@@ -14,9 +14,9 @@ fun Map<String, PsiElement>.resolvedReference(tag: String): PsiElement? =
 fun PsiFile.findElementMatching(pattern: ElementPattern<out PsiElement>): PsiElement? {
   val visitor = object : PsiElementVisitor() {
     var result: PsiElement? = null
-    override fun visitElement(element: PsiElement?) {
+    override fun visitElement(element: PsiElement) {
       when {
-        element == null || result != null -> return
+        result != null -> return
         pattern.accepts(element) -> {
           result = element
         }
