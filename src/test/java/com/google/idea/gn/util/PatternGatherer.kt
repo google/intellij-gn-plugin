@@ -16,10 +16,7 @@ class PatternGatherer(val patterns: Map<String, ElementPattern<out PsiElement>>)
   fun gather(root: PsiElement): Map<String, PsiElement> {
     val result = mutableMapOf<String, PsiElement>()
     root.accept(object : PsiElementVisitor() {
-      override fun visitElement(element: PsiElement?) {
-        if (element == null) {
-          return
-        }
+      override fun visitElement(element: PsiElement) {
         for (p in patterns) {
           if (p.value.accepts(element)) {
             if (result.containsKey(p.key)) {

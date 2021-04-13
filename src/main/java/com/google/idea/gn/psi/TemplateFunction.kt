@@ -114,9 +114,9 @@ class TemplateFunction(override val identifierName: String, val declaration: GnC
 
       override fun shouldExecuteExpr(expr: GnExpr): Boolean {
         expr.accept(object : PsiElementVisitor() {
-          override fun visitElement(element: PsiElement?) {
+          override fun visitElement(element: PsiElement) {
             if (element !is GnScopeAccess) {
-              element?.acceptChildren(this)
+              element.acceptChildren(this)
               return
             }
             if (element.idList.size < 2) {

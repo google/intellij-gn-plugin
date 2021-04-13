@@ -9,6 +9,7 @@ import com.google.idea.gn.psi.reference.GnCallIdentifierReference
 import com.google.idea.gn.psi.scope.FileScope
 import com.intellij.lang.annotation.AnnotationHolder
 import com.intellij.lang.annotation.Annotator
+import com.intellij.lang.annotation.HighlightSeverity
 import com.intellij.psi.PsiElement
 
 class GnAnnotator : Annotator {
@@ -38,8 +39,8 @@ class GnAnnotator : Annotator {
       GnColors.VARIABLE
     }
     color?.let {
-      val annotation = holder.createInfoAnnotation(identifier, null)
-      annotation.textAttributes = it.textAttributesKey
+      holder.newSilentAnnotation(HighlightSeverity.INFORMATION)
+          .textAttributes(it.textAttributesKey).createAnnotation()
     }
   }
 
