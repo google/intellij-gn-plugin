@@ -94,8 +94,9 @@ patchPluginXml {
     sinceBuild intellijSinceBuild
     untilBuild intellijUntilBuild
     changeNotes """
-    <h2>First release</h2>
-  </change-notes>
+    <ul>
+        <li>Compatibility with 211.* IDEs</li>
+    </ul>
     """
 }
 
