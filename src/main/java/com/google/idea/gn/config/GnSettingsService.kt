@@ -21,7 +21,7 @@ interface GnSettingsService {
 }
 
 val Project.gnSettings: GnSettingsService
-  get() = ServiceManager.getService(this, GnSettingsService::class.java)
+  get() = getService(GnSettingsService::class.java)
       ?: error("Failed to get GnSettingsService for $this")
 
 val Project.gnRoot: VirtualFile?
