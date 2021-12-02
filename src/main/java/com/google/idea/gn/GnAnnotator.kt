@@ -40,7 +40,7 @@ class GnAnnotator : Annotator {
     }
     color?.let {
       holder.newSilentAnnotation(HighlightSeverity.INFORMATION)
-          .textAttributes(it.textAttributesKey).createAnnotation()
+          .textAttributes(it.textAttributesKey).create()
     }
   }
 
