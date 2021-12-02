@@ -30,7 +30,7 @@ class GnCallIdentifierReference(val call: GnCall) : PsiReferenceBase<PsiElement?
             // Template and import calls must be executed so they show up in the scope.
             function is Template ||
                 function is Import -> Visitor.CallAction.EXECUTE
-            this@GnCallIdentifierReference.call.parents()
+            this@GnCallIdentifierReference.call.parents(true)
                 .contains(call) -> Visitor.CallAction.VISIT_BLOCK
             else -> Visitor.CallAction.SKIP
           }
