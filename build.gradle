@@ -88,14 +88,14 @@ sourceSets {
 }
 
 def intellijSinceBuild = '211.6693'
-def intellijUntilBuild = '212.*'
+def intellijUntilBuild = '213.*'
 
 patchPluginXml {
     sinceBuild intellijSinceBuild
     untilBuild intellijUntilBuild
     changeNotes """
     <ul>
-        <li>Compatibility with 212.* IDEs</li>
+        <li>Compatibility with 213.* IDEs</li>
     </ul>
     """
 }
