@@ -55,6 +55,7 @@
     <documentationProvider implementation="com.google.idea.gn.GnDocumentationProvider"/>
 
     <lang.commenter language="gn" implementationClass="com.google.idea.gn.GnCommenter"/>
+    <lang.foldingBuilder language="gn" implementationClass="com.google.idea.gn.GnFoldingBuilder"/>
 
     <!-- configs -->
 

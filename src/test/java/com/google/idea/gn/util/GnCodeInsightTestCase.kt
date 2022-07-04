@@ -15,8 +15,22 @@ import com.intellij.openapi.vfs.VirtualFileVisitor
 import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiManager
 import com.intellij.testFramework.LightPlatformCodeInsightTestCase
+import com.intellij.testFramework.fixtures.IdeaTestExecutionPolicy
+import com.intellij.testFramework.fixtures.IdeaTestFixtureFactory
+import com.intellij.testFramework.fixtures.TempDirTestFixture
+import com.intellij.testFramework.fixtures.impl.CodeInsightTestFixtureImpl
+import com.intellij.testFramework.fixtures.impl.LightTempDirTestFixtureImpl
 
 abstract class GnCodeInsightTestCase : LightPlatformCodeInsightTestCase() {
+
+  override fun setUp() {
+    val factory = IdeaTestFixtureFactory.getFixtureFactory()
+    val fixtureBuilder = factory.createLightFixtureBuilder(projectDescriptor)
+    myFixture = CodeInsightTestFixtureImpl(fixtureBuilder.fixture, getTempDirFixture())
+    myFixture.setUp();
+  }
+
+  protected lateinit var myFixture :CodeInsightTestFixtureImpl;
 
   val LOGGER = Logger.getInstance(GnPsiUtil.javaClass)
 
@@ -61,4 +75,8 @@ abstract class GnCodeInsightTestCase : LightPlatformCodeInsightTestCase() {
     }
   }
 
+  protected fun getTempDirFixture(): TempDirTestFixture {
+    val policy = IdeaTestExecutionPolicy.current()
+    return if (policy != null) policy.createTempDirTestFixture() else LightTempDirTestFixtureImpl(true)
+  }
 }
