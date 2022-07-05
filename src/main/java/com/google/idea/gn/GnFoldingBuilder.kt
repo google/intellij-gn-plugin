@@ -17,7 +17,7 @@ class GnFoldingBuilder : FoldingBuilderEx(), DumbAware {
         val descriptors: MutableList<FoldingDescriptor> = ArrayList()
 
         //Block
-        val blocks = PsiTreeUtil.findChildrenOfType<GnBlockImpl>(root, GnBlockImpl::class.java)
+        val blocks = PsiTreeUtil.findChildrenOfType(root, GnBlockImpl::class.java)
         for (block in blocks) {
             val first = block.firstChild
             val last = block.lastChild
@@ -28,7 +28,7 @@ class GnFoldingBuilder : FoldingBuilderEx(), DumbAware {
         }
 
         // Collections
-        val collections = PsiTreeUtil.findChildrenOfType<GnCollectionImpl>(root, GnCollectionImpl::class.java)
+        val collections = PsiTreeUtil.findChildrenOfType(root, GnCollectionImpl::class.java)
         for (collection in collections) {
             val first = collection.firstChild
             val last = collection.lastChild
