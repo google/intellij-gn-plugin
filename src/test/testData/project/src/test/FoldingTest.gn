@@ -1,0 +1,18 @@
+items = [<fold text='...'>1,
+    2,
+    3,
+    4
+</fold>]
+
+foreach(item, items) {<fold text='...'>
+    print(item)
+</fold>}
+
+condition = true
+if(condition){<fold text='...'>
+    condition = false
+</fold>}
+
+template("my_template") {<fold text='...'>
+    "a = false"
+</fold>}
