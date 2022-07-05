@@ -7,7 +7,7 @@ open class FoldingTest : GnCodeInsightTestCase() {
     @Test
     fun testBlockFolding() {
         var filePath = "$testDataPath/project/src/test/FoldingTest.gn"
-        myFixture.testFolding(filePath);
+        myFixture.testFolding(filePath)
     }
     override fun getTestDataPath() = "src/test/testData"
 }
