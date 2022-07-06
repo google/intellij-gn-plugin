@@ -109,7 +109,7 @@ patchPluginXml {
     untilBuild.set(intellijUntilBuild)
     changeNotes.set("""
     <ul>
-        <li>Compatibility with 221.* IDEs</li>
+        <li>Add Folding by @xiaoxiaowesley</li>
     </ul>
     """)
 }
