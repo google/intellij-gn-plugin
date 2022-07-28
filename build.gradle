@@ -102,14 +102,14 @@ test {
 }
 
 def intellijSinceBuild = '211.6693'
-def intellijUntilBuild = '221.*'
+def intellijUntilBuild = '222.*'
 
 patchPluginXml {
     sinceBuild.set(intellijSinceBuild)
     untilBuild.set(intellijUntilBuild)
     changeNotes.set("""
     <ul>
-        <li>Add Folding by @xiaoxiaowesley</li>
+        <li>Compatibility with 222.* IDEs</li>
     </ul>
     """)
 }
