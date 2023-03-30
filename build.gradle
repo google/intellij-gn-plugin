@@ -109,7 +109,7 @@ patchPluginXml {
     untilBuild.set(intellijUntilBuild)
     changeNotes.set("""
     <ul>
-        <li>Compatibility with 223.* IDEs</li>
+        <li>Compatibility with 231.* IDEs</li>
     </ul>
     """)
 }
