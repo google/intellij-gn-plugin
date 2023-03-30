@@ -102,7 +102,7 @@ test {
 }
 
 def intellijSinceBuild = '211.6693'
-def intellijUntilBuild = '223.*'
+def intellijUntilBuild = '231.*'
 
 patchPluginXml {
     sinceBuild.set(intellijSinceBuild)
