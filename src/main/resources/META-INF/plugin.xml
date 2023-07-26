@@ -2,7 +2,7 @@
 <!-- Use of this source code is governed by a BSD-style -->
 <!-- license that can be found in the LICENSE file. -->
 
-<idea-plugin>
+<idea-plugin require-restart="false">
   <id>com.google.idea.gn</id>
   <name>GN</name>
   <vendor
