@@ -1,0 +1,28 @@
+[versions]
+
+# plugins
+kotlin = "1.6.20"
+gradleIntellijPlugin = "1.16.0"
+grammerKit = "2021.2.2"
+gitVersion = "0.12.3"
+
+junit = "5.8.2"
+
+[libraries]
+
+kotlinStdlib = { group = "org.jetbrains.kotlin", name = "kotlin-stdlib", version.ref = "kotlin" }
+# test only
+kotlinTest = { group = "org.jetbrains.kotlin", name = "kotlin-test", version.ref = "kotlin" }
+kotlinTestJdk7 = { group = "org.jetbrains.kotlin", name = "kotlin-stdlib-jdk7", version.ref = "kotlin" }
+
+junitBom = { module = "org.junit:junit-bom", version.ref = "junit" }
+junitPlatformLauncher = { group = "org.junit.platform", name = "junit-platform-launcher" }
+junitJupiterEngine = { group = "org.junit.jupiter", name = "junit-jupiter-engine" }
+jnintVintageEngine = { group = "org.junit.vintage", name = "junit-vintage-engine" }
+
+[plugins]
+
+kotlin =  { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+gradleIntellijPlugin = { id = "org.jetbrains.intellij", version.ref = "gradleIntellijPlugin" }
+grammerKit = { id = "org.jetbrains.grammarkit", version.ref = "grammerKit" }
+gitVersion = { id = "com.palantir.git-version", version.ref = "gitVersion" }
