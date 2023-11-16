@@ -21,7 +21,6 @@ repositories {
 }
 
 dependencies {
-    implementation(libs.kotlinStdlib)
     testImplementation(libs.kotlinTest)
     testImplementation(libs.kotlinTestJdk7)
     testImplementation(platform(libs.junitBom))
