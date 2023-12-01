@@ -2,7 +2,7 @@ import org.jetbrains.grammarkit.tasks.GenerateLexerTask
 import org.jetbrains.grammarkit.tasks.GenerateParserTask
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmCompile
 
-val gitVersion: groovy.lang.Closure<String> by extra
+val versionDetails: groovy.lang.Closure<com.palantir.gradle.gitversion.VersionDetails> by extra
 
 plugins {
     id("java")
@@ -12,7 +12,15 @@ plugins {
     alias(libs.plugins.gitVersion)
 }
 
-version = gitVersion()
+val gitDetails = versionDetails()
+version = if (gitDetails.isCleanTag) {
+    gitDetails.version
+} else {
+    // eg. 0.1.4-dev.12345678
+    providers.gradleProperty("intellijGnVersion").get().ifEmpty {
+        throw IllegalStateException("intellijGnVersion must be set in gradle.properties")
+    } + "-dev." + gitDetails.gitHash
+}
 
 java.sourceCompatibility = JavaVersion.VERSION_11
 
