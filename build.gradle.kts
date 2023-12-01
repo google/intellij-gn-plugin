@@ -1,5 +1,6 @@
 import org.jetbrains.grammarkit.tasks.GenerateLexerTask
 import org.jetbrains.grammarkit.tasks.GenerateParserTask
+import org.jetbrains.changelog.Changelog
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmCompile
 
 val versionDetails: groovy.lang.Closure<com.palantir.gradle.gitversion.VersionDetails> by extra
@@ -9,6 +10,7 @@ plugins {
     alias(libs.plugins.kotlin)
     alias(libs.plugins.gradleIntellijPlugin)
     alias(libs.plugins.grammerKit)
+    alias(libs.plugins.changelog)
     alias(libs.plugins.gitVersion)
 }
 
@@ -79,6 +81,10 @@ intellij {
     sandboxDir = "tmp/sandbox"
 }
 
+changelog {
+    groups.empty()
+}
+
 tasks.named("compileKotlin") {
     setDependsOn(listOf(tasks.named("generateLexerTask"), tasks.named("generateParserTask")))
 }
@@ -105,11 +111,18 @@ val intellijUntilBuild = "232.*"
 tasks.patchPluginXml {
     sinceBuild = intellijSinceBuild
     untilBuild = intellijUntilBuild
-    changeNotes = """
-    <ul>
-        <li>Compatibility with 232.* IDEs</li>
-    </ul>
-    """.trimIndent()
+    val changelog = project.changelog // local variable for configuration cache compatibility
+    // Get the latest available change notes from the changelog file
+    changeNotes = providers.gradleProperty("intellijGnVersion").map { pluginVersion ->
+        with(changelog) {
+            renderItem(
+                (getOrNull(pluginVersion) ?: getUnreleased())
+                    .withHeader(false)
+                    .withEmptySections(false),
+                Changelog.OutputType.HTML,
+            )
+        }
+    }
 }
 
 tasks.publishPlugin {
