@@ -106,11 +106,9 @@ tasks.withType<Test> {
 }
 
 val intellijSinceBuild = "221"
-val intellijUntilBuild = "232.*"
 
 tasks.patchPluginXml {
     sinceBuild = intellijSinceBuild
-    untilBuild = intellijUntilBuild
     val changelog = project.changelog // local variable for configuration cache compatibility
     // Get the latest available change notes from the changelog file
     changeNotes = providers.gradleProperty("intellijGnVersion").map { pluginVersion ->
@@ -140,7 +138,7 @@ task("serverPlugins") {
     <<plugin id="com.google.idea.gn" url="http://localhost:8080/gn-${version}.zip" version="$version">
       <name>GN</name>
       <description>Experimental GN plugin for intellij</description>
-    <idea-version since-build="$intellijSinceBuild" until-build="$intellijUntilBuild" />
+    <idea-version since-build="$intellijSinceBuild" />
   </plugin>
 </plugins>
 """.trimIndent())
