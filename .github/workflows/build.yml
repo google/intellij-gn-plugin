@@ -27,20 +27,7 @@ jobs:
           gradle-home-cache-cleanup: true
 
       - name: Build plugin
-        run: |
-          set +e
-          ./gradlew buildPlugin --stacktrace
-          ret=$?
-          set -e
-          if [[ $ret -ne 0 ]]; then
-            # Workaround for failing build on GitHub Actions 
-            echo "Print current directory structure"
-            ls -R .
-            echo "Retry build"
-            ./gradlew buildPlugin --stacktrace
-            echo "Print current directory structure after second build"
-            ls -R .
-          fi
+        run: ./gradlew buildPlugin
 
       - name: Prepare Plugin Artifact
         id: artifact
