@@ -1,0 +1,20 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended"
+  ],
+  "packageRules": [
+    {
+      "description": "Kotlin version should be managed in coordinate with Intellij Platform minimum version",
+      "matchDatasources": ["maven"],
+      "matchDepPatterns": ["^org.jetbrains.kotlin:kotlin"],
+      "enabled": false
+    },
+    {
+      "description": "Kotlin version should be managed in coordinate with Intellij Platform minimum version",
+      "matchDatasources": ["maven"],
+      "matchDepPatterns": ["^org.jetbrains.kotlin.jvm"],
+      "enabled": false
+    }
+  ]
+}
