@@ -4,7 +4,7 @@
 kotlin = "1.6.20"
 gradleIntellijPlugin = "1.16.0"
 grammerKit = "2021.2.2"
-gitVersion = "0.12.3"
+gitVersion = "3.0.0"
 
 junit = "5.8.2"
 
