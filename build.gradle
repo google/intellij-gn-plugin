@@ -6,7 +6,7 @@ plugins {
     id 'java'
     id 'org.jetbrains.intellij' version '1.16.0'
     id 'org.jetbrains.grammarkit' version '2021.2.2'
-    id 'org.jetbrains.kotlin.jvm' version '1.5.31'
+    id 'org.jetbrains.kotlin.jvm' version '1.6.20'
     id 'com.palantir.git-version' version '0.12.3'
 }
 
@@ -25,8 +25,10 @@ repositories {
 }
 
 dependencies {
-    implementation 'org.jetbrains.kotlin:kotlin-stdlib:1.5.31'
-    testImplementation 'org.jetbrains.kotlin:kotlin-test:1.5.31'
+    // Intellij Platform bundles Kotlin and it changes over time.
+    // https://plugins.jetbrains.com/docs/intellij/using-kotlin.html#kotlin-standard-library
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib:1.6.20'
+    testImplementation 'org.jetbrains.kotlin:kotlin-test:1.6.20'
     testImplementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk7'
     testImplementation platform('org.junit:junit-bom:5.8.2')
     testRuntimeOnly ("org.junit.platform:junit-platform-launcher") {
@@ -73,9 +75,9 @@ task generateParserTask(type: GenerateParserTask) {
 
 // See https://github.com/JetBrains/gradle-intellij-plugin/
 intellij {
-    version.set('2021.3')
+    version.set('2022.1')
     sandboxDir.set('tmp/sandbox')
-    plugins.set(['PsiViewer:213-SNAPSHOT'])
+    plugins.set(['PsiViewer:221-SNAPSHOT'])
 }
 
 tasks.withType(compileKotlin.class) {
@@ -101,7 +103,7 @@ test {
     useJUnitPlatform()
 }
 
-def intellijSinceBuild = '211.6693'
+def intellijSinceBuild = '221'
 def intellijUntilBuild = '232.*'
 
 patchPluginXml {
