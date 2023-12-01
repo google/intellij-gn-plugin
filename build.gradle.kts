@@ -47,7 +47,7 @@ grammarKit {
 
 task("generateLexerTask", GenerateLexerTask::class) {
     // source flex file
-    source = "src/grammar/gn.flex"
+    sourceFile.set(file("src/grammar/gn.flex"))
 
     // target directory for lexer
     targetDir = "src/gen/com/google/idea/gn"
@@ -61,7 +61,7 @@ task("generateLexerTask", GenerateLexerTask::class) {
 
 task("generateParserTask", GenerateParserTask::class) {
     // source bnf file
-    source = "src/grammar/gn.bnf"
+    sourceFile.set(file("src/grammar/gn.bnf"))
 
     // optional, task-specific root for the generated files. Default: none
     targetRoot = "src/gen"
