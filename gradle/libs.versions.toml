@@ -6,7 +6,7 @@ gradleIntellijPlugin = "1.16.0"
 grammerKit = "2021.2.2"
 gitVersion = "3.0.0"
 
-junit = "5.8.2"
+junit = "5.10.1"
 
 [libraries]
 
