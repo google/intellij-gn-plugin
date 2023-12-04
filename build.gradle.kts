@@ -106,9 +106,11 @@ tasks.withType<Test> {
 }
 
 val intellijSinceBuild = "221"
+val intellijUntilBuild = ""
 
 tasks.patchPluginXml {
     sinceBuild = intellijSinceBuild
+    untilBuild = intellijUntilBuild
     val changelog = project.changelog // local variable for configuration cache compatibility
     // Get the latest available change notes from the changelog file
     changeNotes = providers.gradleProperty("intellijGnVersion").map { pluginVersion ->
