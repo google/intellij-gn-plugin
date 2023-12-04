@@ -48,6 +48,8 @@
         language="gn"/>
     <lang.formatter language="gn"
         implementationClass="com.google.idea.gn.GnFormattingBuilder"/>
+    <lang.elementManipulator forClass="com.google.idea.gn.psi.impl.GnStringExprImpl"
+                             implementationClass="com.google.idea.gn.manipulators.GnStringExprManipulator"/>
     <enterBetweenBracesDelegate implementationClass="com.google.idea.gn.GnEnterDelegate"
         language="gn"/>
     <colorSettingsPage implementation="com.google.idea.gn.GnColorSettingsPage"/>
