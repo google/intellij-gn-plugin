@@ -50,10 +50,7 @@ task("generateLexerTask", GenerateLexerTask::class) {
     sourceFile.set(file("src/grammar/gn.flex"))
 
     // target directory for lexer
-    targetDir = "src/gen/com/google/idea/gn"
-
-    // target classname, target file will be targetDir/targetClass.java
-    targetClass = "GnLexer"
+    targetOutputDir = project.layout.projectDirectory.dir("src/gen/com/google/idea/gn")
 
     // if set, plugin will remove a lexer output file before generating new one. Default: false
     purgeOldFiles = true
@@ -64,7 +61,7 @@ task("generateParserTask", GenerateParserTask::class) {
     sourceFile.set(file("src/grammar/gn.bnf"))
 
     // optional, task-specific root for the generated files. Default: none
-    targetRoot = "src/gen"
+    targetRootOutputDir = project.layout.projectDirectory.dir("src/gen")
 
     // path to a parser file, relative to the targetRoot
     pathToParser = "/com/google/idea/gn/parser/GnParser.java"
