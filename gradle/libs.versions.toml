@@ -7,7 +7,7 @@ grammerKit = "2022.3.2.2"
 changelog = "2.2.0"
 gitVersion = "3.0.0"
 
-junit = "5.10.1"
+junit = "5.10.2"
 
 [libraries]
 
