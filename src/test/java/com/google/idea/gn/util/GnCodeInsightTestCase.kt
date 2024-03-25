@@ -25,7 +25,7 @@ abstract class GnCodeInsightTestCase : LightPlatformCodeInsightTestCase() {
 
   override fun setUp() {
     val factory = IdeaTestFixtureFactory.getFixtureFactory()
-    val fixtureBuilder = factory.createLightFixtureBuilder(projectDescriptor)
+    val fixtureBuilder = factory.createLightFixtureBuilder(projectDescriptor, "gnCodeInsightTest")
     myFixture = CodeInsightTestFixtureImpl(fixtureBuilder.fixture, getTempDirFixture())
     myFixture.setUp();
   }
