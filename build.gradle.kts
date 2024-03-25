@@ -87,8 +87,24 @@ tasks.named("compileKotlin") {
     setDependsOn(listOf(tasks.named("generateLexerTask"), tasks.named("generateParserTask")))
 }
 
+tasks.withType<JavaCompile> {
+    val enableWarningAsError = project.findProperty("enableWarningAsError")?.toString()?.toBoolean() ?: false
+    if (enableWarningAsError) {
+        var compilerArgs = options.compilerArgs
+        if (compilerArgs == null) {
+            compilerArgs = mutableListOf()
+        }
+        compilerArgs.add("-Werror")
+        options.compilerArgs = compilerArgs
+    }
+}
+
 tasks.withType<KotlinJvmCompile> {
+    val enableWarningAsError = project.findProperty("enableWarningAsError")?.toString()?.toBoolean() ?: false
     kotlinOptions.jvmTarget = "17"
+    if (enableWarningAsError) {
+        kotlinOptions.allWarningsAsErrors = true
+    }
 }
 
 sourceSets {

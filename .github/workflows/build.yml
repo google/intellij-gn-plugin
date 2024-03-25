@@ -27,7 +27,7 @@ jobs:
           gradle-home-cache-cleanup: true
 
       - name: Build plugin
-        run: ./gradlew buildPlugin
+        run: ./gradlew buildPlugin -PenableWarningAsError=true
 
       - name: Prepare Plugin Artifact
         id: artifact
