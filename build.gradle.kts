@@ -24,7 +24,8 @@ version = if (gitDetails.isCleanTag) {
     } + "-dev." + gitDetails.gitHash
 }
 
-java.sourceCompatibility = JavaVersion.VERSION_11
+java.sourceCompatibility = JavaVersion.VERSION_17
+java.targetCompatibility = JavaVersion.VERSION_17
 
 repositories {
     mavenCentral()
@@ -74,7 +75,7 @@ task("generateParserTask", GenerateParserTask::class) {
 }
 
 intellij {
-    version = "2022.1"
+    version = "2022.3"
     sandboxDir = "tmp/sandbox"
 }
 
@@ -87,7 +88,7 @@ tasks.named("compileKotlin") {
 }
 
 tasks.withType<KotlinJvmCompile> {
-    kotlinOptions.jvmTarget = "11"
+    kotlinOptions.jvmTarget = "17"
 }
 
 sourceSets {
@@ -102,7 +103,7 @@ tasks.withType<Test> {
     useJUnitPlatform()
 }
 
-val intellijSinceBuild = "221"
+val intellijSinceBuild = "223"
 val intellijUntilBuild = ""
 
 tasks.patchPluginXml {

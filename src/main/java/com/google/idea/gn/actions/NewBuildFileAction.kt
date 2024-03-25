@@ -25,6 +25,8 @@ class NewBuildFileAction : AnAction(CAPTION, "", GnIcons.FILE) {
     return dir.virtualFile.findChild(GnFile.BUILD_FILE) == null
   }
 
+  override fun getActionUpdateThread(): ActionUpdateThread = ActionUpdateThread.BGT
+
   override fun update(e: AnActionEvent) {
     val dataContext = e.dataContext
     val presentation = e.presentation

@@ -1,7 +1,7 @@
 [versions]
 
 # plugins
-kotlin = "1.6.20"
+kotlin = "1.7.0"
 gradleIntellijPlugin = "1.17.2"
 grammerKit = "2022.3.2.2"
 changelog = "2.2.0"
@@ -11,7 +11,6 @@ junit = "5.10.2"
 
 [libraries]
 
-kotlinStdlib = { group = "org.jetbrains.kotlin", name = "kotlin-stdlib", version.ref = "kotlin" }
 # test only
 kotlinTest = { group = "org.jetbrains.kotlin", name = "kotlin-test", version.ref = "kotlin" }
 kotlinTestJdk7 = { group = "org.jetbrains.kotlin", name = "kotlin-stdlib-jdk7", version.ref = "kotlin" }
