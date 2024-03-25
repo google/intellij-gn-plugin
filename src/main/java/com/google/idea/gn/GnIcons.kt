@@ -6,5 +6,6 @@ package com.google.idea.gn
 import com.intellij.openapi.util.IconLoader
 
 object GnIcons {
+  @JvmField
   val FILE = IconLoader.getIcon("/icons/gn.svg", GnIcons.javaClass)
 }

@@ -73,8 +73,10 @@
   </extensions>
 
   <actions>
+    <!--suppress PluginXmlCapitalization -->
     <action class="com.google.idea.gn.actions.NewBuildFileAction" id="Gn.NewBuildFile"
-        text="Build File" description="Create new BUILD.gn file">
+            text="BUILD.gn" description="Create new BUILD.gn file"
+            icon="/icons/gn.svg">
       <add-to-group group-id="NewGroup" anchor="after"
           relative-to-action="FileTemplateSeparatorGroup"/>
     </action>

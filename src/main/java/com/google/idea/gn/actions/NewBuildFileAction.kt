@@ -3,7 +3,6 @@
 // license that can be found in the LICENSE file.
 package com.google.idea.gn.actions
 
-import com.google.idea.gn.GnIcons
 import com.google.idea.gn.psi.GnFile
 import com.intellij.ide.actions.CreateFileFromTemplateAction
 import com.intellij.ide.fileTemplates.FileTemplateManager
@@ -12,11 +11,8 @@ import com.intellij.util.containers.getIfSingle
 import com.intellij.util.containers.stream
 
 
-class NewBuildFileAction : AnAction(CAPTION, "", GnIcons.FILE) {
+class NewBuildFileAction : AnAction() {
 
-  private companion object {
-    private const val CAPTION = "BUILD.gn"
-  }
 
   private fun isAvailable(dataContext: DataContext): Boolean {
     // Only show action if a BUILD.gn file does not exist.
