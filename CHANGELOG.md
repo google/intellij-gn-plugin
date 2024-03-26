@@ -2,6 +2,8 @@
 
 # IntelliJ GN Plugin Changelog
 
+## [Unreleased]
+
 ## [0.1.4] - 2023-12-04
 
 ### Changed
